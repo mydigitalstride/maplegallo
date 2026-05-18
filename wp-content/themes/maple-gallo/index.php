@@ -81,9 +81,7 @@ $quiz_count = count(mg_get_quiz_questions());
     <div class="container">
         <div class="about-grid">
             <div class="about-img-wrap">
-                <img src="<?php echo esc_url(get_template_directory_uri() . '/images/maple-hero.jpg'); ?>"
-                     alt="Maple Gallo"
-                     onerror="this.src='https://placehold.co/480x600/7a9e87/fff?text=Maple'">
+                <img src="http://maplegallo.com/wp-content/uploads/2026/05/PXL_20250918_231040412.jpg">
                 <div class="about-img-badge"><span class="badge-year">2026</span>Graduate</div>
             </div>
             <div class="about-text">

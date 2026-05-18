@@ -20,7 +20,6 @@
                 <li><a href="#quiz">Trivia</a></li>
                 <li><a href="#leaderboard">Leaderboard</a></li>
                 <li><a href="#stories">Leave a Tip</a></li>
-                <li><a href="#emt-fund" class="nav-cta">EMT Fund 💚</a></li>
             </ul>
         </nav>
 

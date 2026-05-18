@@ -1,6 +1,6 @@
 <footer class="site-footer">
     <div class="container">
-        <div class="footer-logo">🌿 Maple Gallo</div>
+        <div class="footer-logo">Maple Gallo</div>
         <div class="footer-tagline">Class of 2026 · High School Graduate · EMT Certified · Farm Party!</div>
 
         <nav aria-label="Footer">
@@ -11,13 +11,12 @@
                 <li><a href="#quiz"        style="color:var(--eucalyptus-lt);">Trivia</a></li>
                 <li><a href="#leaderboard" style="color:var(--eucalyptus-lt);">Leaderboard</a></li>
                 <li><a href="#stories"     style="color:var(--eucalyptus-lt);">Stories</a></li>
-                <li><a href="#emt-fund"    style="color:var(--gold-lt);">EMT Fund 💚</a></li>
             </ul>
         </nav>
 
         <div class="footer-divider"></div>
         <div class="footer-copy">
-            Made with 🌿 &amp; ❤️ for Maple Gallo &mdash;
+            Made with love for Maple Gallo &mdash;
             <?php echo date('Y'); ?>
         </div>
     </div>

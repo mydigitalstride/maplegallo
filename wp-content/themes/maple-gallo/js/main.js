@@ -366,11 +366,12 @@ function mgRenderQuestion() {
         inp.addEventListener('keydown', e => { if (e.key === 'Enter') mgSubmitFill(); });
         setTimeout(() => inp.focus(), 50);
     } else {
+        const isTwoOpt = type === 'yesno' || type === 'twooption';
         const opts = type === 'yesno' ? ['Yes','No'] : q.opts;
         optWrap.innerHTML = (ptsBadge ? `<div class="quiz-pts-row">${ptsBadge}</div>` : '') +
             opts.map((opt, i) => `
             <button class="quiz-option" onclick="mgSelectAnswer(${i})" data-index="${i}">
-                <span class="quiz-option-letter">${type === 'yesno' ? (i === 0 ? 'Y' : 'N') : letters[i]}</span>
+                <span class="quiz-option-letter">${isTwoOpt ? (i === 0 ? 'A' : 'B') : letters[i]}</span>
                 <span>${opt}</span>
             </button>
         `).join('');
@@ -401,7 +402,7 @@ function mgSelectAnswer(selectedIndex) {
         if (i === selectedIndex && !correct) btn.classList.add('wrong');
     });
 
-    const correctLabel = (q.type === 'yesno') ? (q.correct === 0 ? 'Yes' : 'No') : q.opts[q.correct];
+    const correctLabel = q.type === 'yesno' ? (q.correct === 0 ? 'Yes' : 'No') : q.opts[q.correct];
     const fb = document.getElementById('quiz-feedback');
     fb.className = `quiz-feedback show ${correct ? 'correct-fb' : 'wrong-fb'}`;
     fb.innerHTML = correct

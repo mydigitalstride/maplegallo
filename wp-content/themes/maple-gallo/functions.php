@@ -480,7 +480,7 @@ function mg_quiz_admin_page() {
         $raw = $_POST['questions'] ?? [];
         $clean = [];
         foreach ($raw as $q) {
-            $type = in_array($q['type'] ?? '', ['multiple','yesno','fill']) ? $q['type'] : 'multiple';
+            $type = in_array($q['type'] ?? '', ['multiple','yesno','twooption','fill']) ? $q['type'] : 'multiple';
             $opts = array_map('sanitize_text_field', (array) ($q['opts'] ?? []));
             $clean[] = [
                 'type'    => $type,
@@ -563,9 +563,10 @@ function mg_quiz_admin_page() {
     function updateQuestionType(sel) {
         const row = sel.closest('.question-row');
         const type = sel.value;
-        row.querySelector('.opts-multiple').style.display  = type === 'multiple' ? '' : 'none';
-        row.querySelector('.opts-yesno').style.display     = type === 'yesno'    ? '' : 'none';
-        row.querySelector('.opts-fill').style.display      = type === 'fill'     ? '' : 'none';
+        row.querySelector('.opts-multiple').style.display   = type === 'multiple'  ? '' : 'none';
+        row.querySelector('.opts-yesno').style.display      = type === 'yesno'     ? '' : 'none';
+        row.querySelector('.opts-twooption').style.display  = type === 'twooption' ? '' : 'none';
+        row.querySelector('.opts-fill').style.display       = type === 'fill'      ? '' : 'none';
     }
     // Init all existing rows on page load
     document.querySelectorAll('.q-type-select').forEach(updateQuestionType);
@@ -581,12 +582,13 @@ function mg_quiz_admin_page() {
 function mg_render_question_row(int|string $i, array $q): void {
     $letters = ['A','B','C','D'];
     $correct = (int) ($q['correct'] ?? 0);
-    $type    = in_array($q['type'] ?? '', ['multiple','yesno','fill']) ? $q['type'] : 'multiple';
+    $type    = in_array($q['type'] ?? '', ['multiple','yesno','twooption','fill']) ? $q['type'] : 'multiple';
     $points  = max(1, (int) ($q['points'] ?? 1));
 
-    $show_multiple = $type === 'multiple' ? '' : 'display:none;';
-    $show_yesno    = $type === 'yesno'    ? '' : 'display:none;';
-    $show_fill     = $type === 'fill'     ? '' : 'display:none;';
+    $show_multiple   = $type === 'multiple'  ? '' : 'display:none;';
+    $show_yesno      = $type === 'yesno'     ? '' : 'display:none;';
+    $show_twooption  = $type === 'twooption' ? '' : 'display:none;';
+    $show_fill       = $type === 'fill'      ? '' : 'display:none;';
     ?>
     <div class="question-row">
         <h3>
@@ -605,8 +607,9 @@ function mg_render_question_row(int|string $i, array $q): void {
             <div>
                 <label>Question Type</label>
                 <select name="questions[<?php echo $i; ?>][type]" class="q-type-select">
-                    <option value="multiple" <?php selected($type, 'multiple'); ?>>Multiple Choice (4 options)</option>
+                    <option value="multiple"  <?php selected($type, 'multiple'); ?>>Multiple Choice (4 options)</option>
                     <option value="yesno"    <?php selected($type, 'yesno'); ?>>Yes / No</option>
+                    <option value="twooption"<?php selected($type, 'twooption'); ?>>Two Options (custom labels)</option>
                     <option value="fill"     <?php selected($type, 'fill'); ?>>Fill in the Blank</option>
                 </select>
             </div>
@@ -661,6 +664,40 @@ function mg_render_question_row(int|string $i, array $q): void {
                     <!-- Hidden opts so they post correctly -->
                     <input type="hidden" name="questions[<?php echo $i; ?>][opts][0]" value="Yes">
                     <input type="hidden" name="questions[<?php echo $i; ?>][opts][1]" value="No">
+                </div>
+            </div>
+
+            <!-- Two Options (custom labels) -->
+            <div class="q-full opts-twooption" style="<?php echo $show_twooption; ?>">
+                <label>Option Labels &amp; Correct Answer</label>
+                <div class="q-grid" style="margin-top:8px;">
+                    <div>
+                        <label>Option A</label>
+                        <input type="text" name="questions[<?php echo $i; ?>][opts][0]"
+                               value="<?php echo esc_attr($q['opts'][0] ?? ''); ?>"
+                               placeholder="e.g. True">
+                    </div>
+                    <div>
+                        <label>Option B</label>
+                        <input type="text" name="questions[<?php echo $i; ?>][opts][1]"
+                               value="<?php echo esc_attr($q['opts'][1] ?? ''); ?>"
+                               placeholder="e.g. False">
+                    </div>
+                </div>
+                <div class="correct-row" style="margin-top:10px;">
+                    <strong style="font-size:13px;">Correct Answer:</strong>
+                    <label>
+                        <input type="radio" name="questions[<?php echo $i; ?>][correct]"
+                               value="0"
+                               <?php if ($type === 'twooption') checked($correct, 0); ?>>
+                        A
+                    </label>
+                    <label>
+                        <input type="radio" name="questions[<?php echo $i; ?>][correct]"
+                               value="1"
+                               <?php if ($type === 'twooption') checked($correct, 1); ?>>
+                        B
+                    </label>
                 </div>
             </div>
 

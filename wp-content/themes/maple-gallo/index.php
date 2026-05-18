@@ -4,7 +4,8 @@ get_header();
 
 $party_date  = get_option('maple_party_date',  '2026-06-15T18:00:00');
 $party_venue = get_option('maple_party_venue', 'The Old Oak Farm');
-$about_text  = get_option('maple_about_text',  "Maple Gallo is officially a graduate! After years of hard work, late nights studying, and an unstoppable drive to serve her community, Maple has earned her degree and is on her way to becoming a certified EMT.\n\nJoin us as we celebrate this incredible milestone at a rustic farm gathering filled with good food, great music, and even better company.");
+$about_text  = get_option('maple_about_text',  "Maple Gallo is officially a graduate! After years of hard work, late nights studying, and an unstoppable drive to serve their community, Maple has earned their high school diploma and their EMT Certification — at the same time.\n\nJoin us as we celebrate this incredible double milestone at a rustic farm gathering filled with good food, great music, and even better company.");
+$venmo_url   = get_option('maple_venmo_url',   'https://venmo.com/maplegallo');
 
 $party_datetime = new DateTime($party_date);
 $formatted_date = $party_datetime->format('F j, Y');
@@ -15,7 +16,6 @@ $formatted_time = $party_datetime->format('g:i A');
      ║  HERO                                                    ║
      ╚══════════════════════════════════════════════════════════╝ -->
 <section class="hero" id="home">
-    <?php get_template_part('template-parts/string-lights', null, ['top' => true]); ?>
 
     <!-- Decorative eucalyptus branches (inline SVG) -->
     <div class="hero-eucalyptus-left" aria-hidden="true">
@@ -31,7 +31,7 @@ $formatted_time = $party_datetime->format('g:i A');
             Congratulations
             <span class="hero-title-name">Maple Gallo</span>
         </h1>
-        <p class="hero-subtitle">Class of 2026 &nbsp;·&nbsp; EMT Graduate</p>
+        <p class="hero-subtitle">Class of 2026 &nbsp;·&nbsp; High School Graduate &amp; EMT Certified</p>
 
         <div class="hero-details">
             <div class="hero-detail">
@@ -53,7 +53,7 @@ $formatted_time = $party_datetime->format('g:i A');
 
         <div class="hero-actions">
             <a href="#gallery" class="btn btn-primary">See the Gallery</a>
-            <a href="#donate" class="btn btn-outline">Support the EMT Fund</a>
+            <a href="#emt-fund" class="btn btn-outline">Support the EMT Fund</a>
         </div>
     </div>
 
@@ -97,10 +97,7 @@ $formatted_time = $party_datetime->format('g:i A');
     <div class="container">
         <div class="about-grid">
             <div class="about-img-wrap">
-                <?php
-                $hero_img = get_template_directory_uri() . '/images/maple-hero.jpg';
-                // Falls back to a placeholder if no image uploaded
-                ?>
+                <?php $hero_img = get_template_directory_uri() . '/images/maple-hero.jpg'; ?>
                 <img src="<?php echo esc_url($hero_img); ?>"
                      alt="Maple Gallo"
                      onerror="this.src='https://placehold.co/480x600/7a9e87/fff?text=Maple+🌿'">
@@ -111,7 +108,7 @@ $formatted_time = $party_datetime->format('g:i A');
             </div>
 
             <div class="about-text">
-                <span class="section-label">Her Story</span>
+                <span class="section-label">Their Story</span>
                 <h2 class="section-title">From Student<br>to EMT Hero</h2>
                 <?php
                 $paragraphs = explode("\n\n", $about_text);
@@ -123,8 +120,8 @@ $formatted_time = $party_datetime->format('g:i A');
 
                 <div class="about-stats">
                     <div class="about-stat">
-                        <span class="about-stat-number">4+</span>
-                        <span class="about-stat-label">Years of Study</span>
+                        <span class="about-stat-number">K–12</span>
+                        <span class="about-stat-label">Years of School</span>
                     </div>
                     <div class="about-stat">
                         <span class="about-stat-number">EMT</span>
@@ -151,14 +148,14 @@ $formatted_time = $party_datetime->format('g:i A');
     <div class="container text-center">
         <span class="section-label">Plan Your Evening</span>
         <h2 class="section-title">Party Schedule</h2>
-        <p class="section-subtitle">An evening under the lights at the farm — good food, good people, and great memories.</p>
+        <p class="section-subtitle">An evening at the farm — good food, good people, and great memories.</p>
 
         <div class="timeline">
             <div class="timeline-item">
                 <div class="timeline-dot"></div>
                 <div class="timeline-time">6:00 PM</div>
                 <div class="timeline-title">Guests Arrive</div>
-                <div class="timeline-desc">Welcome drinks &amp; mingle under the string lights</div>
+                <div class="timeline-desc">Welcome drinks &amp; mingle out on the farm</div>
             </div>
             <div class="timeline-item">
                 <div class="timeline-dot"></div>
@@ -221,7 +218,6 @@ $formatted_time = $party_datetime->format('g:i A');
         </div>
 
         <div class="gallery-grid" id="gallery-grid">
-            <!-- Populated via JS/AJAX; seed photos shown as placeholders -->
             <?php
             $seed_photos = [
                 ['label'=>'Childhood',    'cat'=>'childhood', 'color'=>'b2cdb9'],
@@ -355,7 +351,7 @@ $formatted_time = $party_datetime->format('g:i A');
 <section class="quiz-section section-pad" id="quiz">
     <div class="container">
         <div class="text-center">
-            <span class="section-label">How Well Do You Know Her?</span>
+            <span class="section-label">How Well Do You Know Them?</span>
             <h2 class="section-title">Maple Gallo Trivia</h2>
             <p class="section-subtitle">Test your knowledge and compete for the top spot on the leaderboard!</p>
         </div>
@@ -440,98 +436,120 @@ $formatted_time = $party_datetime->format('g:i A');
 </section>
 
 <!-- ╔══════════════════════════════════════════════════════════╗
-     ║  DONATION SECTION                                        ║
+     ║  STORIES / LIFE TIPS                                     ║
      ╚══════════════════════════════════════════════════════════╝ -->
-<section class="donate-section section-pad" id="donate">
+<section class="stories-section section-pad" id="stories">
     <div class="container">
         <div class="text-center">
-            <span class="section-label">Give the Gift of a Future</span>
-            <h2 class="section-title">Support Maple's<br>EMT Future Fund</h2>
-            <p class="section-subtitle">Help Maple pursue her dream of serving her community as an EMT.</p>
+            <span class="section-label">Words of Wisdom</span>
+            <h2 class="section-title">Leave Maple a Tip<br>or Story</h2>
+            <p class="section-subtitle">Share a life lesson, a favorite memory, or some advice to carry into the next chapter.</p>
         </div>
 
-        <div class="donate-grid">
-            <div class="donate-story">
-                <h3>Why the EMT Fund?</h3>
-                <p>Maple's journey to becoming an EMT doesn't stop at graduation. There are certifications, equipment, continuing education, and so much more ahead of her.</p>
-                <p>Your generous contribution goes directly toward supporting Maple's path as she steps into a career dedicated to saving lives and making a difference every single day.</p>
-                <p>Every dollar — big or small — is a vote of confidence in her incredible future.</p>
+        <div class="stories-layout">
 
-                <div class="donate-goal">
-                    <div class="donate-goal-label">Community Goal</div>
-                    <div class="donate-goal-amounts">
-                        <span class="donate-goal-raised" id="goal-raised">$0 raised</span>
-                        <span id="goal-target">of $<?php echo number_format((float) get_option('maple_party_goal', 2000), 0); ?></span>
+            <!-- Submission Form -->
+            <div class="story-form-card">
+                <h3>Share Your Wisdom</h3>
+                <p>Your tip or story will appear here for Maple and all the guests to read.</p>
+
+                <form id="story-form">
+                    <div class="form-group">
+                        <label for="story-author">Your Name <span style="color:#f5a9a0">*</span></label>
+                        <input type="text" id="story-author" name="author" placeholder="e.g. Uncle Dave" required maxlength="60">
                     </div>
-                    <div class="donate-goal-bar">
-                        <div class="donate-goal-fill" id="goal-fill" style="width:0%"></div>
+
+                    <div class="form-group">
+                        <label for="story-title">Give It a Title <span style="color:rgba(255,255,255,.4)">(optional)</span></label>
+                        <input type="text" id="story-title" name="title" placeholder="e.g. The best advice I ever got…" maxlength="80">
                     </div>
+
+                    <div class="form-group">
+                        <label for="story-body">Your Tip or Story <span style="color:#f5a9a0">*</span></label>
+                        <textarea id="story-body" name="body" rows="6"
+                                  placeholder="Share a memory, a life tip, words of encouragement — anything Maple should carry with them into this next chapter…"
+                                  maxlength="800" required></textarea>
+                        <div class="story-char-count"><span id="story-char-num">0</span> / 800</div>
+                    </div>
+
+                    <div class="story-submit-msg" id="story-submit-msg"></div>
+
+                    <button type="submit" class="btn btn-gold" style="width:100%;margin-top:8px;">
+                        Leave My Tip ✨
+                    </button>
+                </form>
+            </div>
+
+            <!-- Stories Display -->
+            <div class="stories-display">
+                <h3>💬 What Everyone's Saying</h3>
+                <div class="story-cards" id="story-cards">
+                    <?php
+                    $stories = get_posts([
+                        'post_type'      => 'mg_story',
+                        'post_status'    => 'publish',
+                        'posts_per_page' => 20,
+                        'orderby'        => 'date',
+                        'order'          => 'DESC',
+                    ]);
+                    if ($stories):
+                        foreach ($stories as $s):
+                            $body    = get_post_meta($s->ID, '_mg_story_body', true);
+                            $author  = $s->post_title;
+                            $stitle  = get_post_meta($s->ID, '_mg_story_title', true);
+                            $date    = get_the_date('M j', $s);
+                            $long    = mb_strlen($body) > 200;
+                    ?>
+                    <div class="story-card">
+                        <?php if ($stitle): ?>
+                        <div class="story-card-title"><?php echo esc_html($stitle); ?></div>
+                        <?php endif; ?>
+                        <div class="story-card-text <?php echo $long ? 'collapsed' : ''; ?>" id="sc-<?php echo $s->ID; ?>">
+                            <?php echo esc_html($body); ?>
+                        </div>
+                        <?php if ($long): ?>
+                        <button class="story-card-expand" onclick="mgExpandStory('sc-<?php echo $s->ID; ?>', this)">Read more</button>
+                        <?php endif; ?>
+                        <div class="story-card-meta">
+                            <span class="story-card-author">— <?php echo esc_html($author); ?></span>
+                            <span class="story-card-date"><?php echo esc_html($date); ?></span>
+                        </div>
+                    </div>
+                    <?php endforeach; else: ?>
+                    <div class="story-empty" id="story-empty">
+                        <p>No stories yet — be the first to leave one! 🌿</p>
+                    </div>
+                    <?php endif; ?>
                 </div>
             </div>
 
-            <div class="donate-form-card">
-                <h3>Make a Pledge</h3>
-                <p>Choose an amount or enter your own. We'll follow up to arrange payment.</p>
-
-                <div id="donate-form-wrap">
-                    <div class="donate-amounts">
-                        <button class="donate-amount-btn" data-amount="25" onclick="mgSelectAmount(this, 25)">$25</button>
-                        <button class="donate-amount-btn active" data-amount="50" onclick="mgSelectAmount(this, 50)">$50</button>
-                        <button class="donate-amount-btn" data-amount="100" onclick="mgSelectAmount(this, 100)">$100</button>
-                        <button class="donate-amount-btn" data-amount="250" onclick="mgSelectAmount(this, 250)">$250</button>
-                        <button class="donate-amount-btn" data-amount="500" onclick="mgSelectAmount(this, 500)">$500</button>
-                        <button class="donate-amount-btn" data-amount="0" onclick="mgSelectAmount(this, 0)">Other</button>
-                    </div>
-
-                    <form class="donate-form" id="donation-form">
-                        <div class="donate-custom form-group">
-                            <label for="donate-custom-input">Custom Amount</label>
-                            <span class="donate-custom-symbol">$</span>
-                            <input type="number" id="donate-custom-input" name="amount"
-                                   value="50" min="1" step="1" placeholder="50">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="donor-name">Your Name <span style="color:#c0392b">*</span></label>
-                            <input type="text" id="donor-name" name="donor_name" placeholder="e.g. Aunt Linda" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="donor-email">Email (for receipt)</label>
-                            <input type="email" id="donor-email" name="donor_email" placeholder="you@example.com">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="donor-message">Message for Maple</label>
-                            <textarea id="donor-message" name="message" rows="3"
-                                      placeholder="Share some words of encouragement…"></textarea>
-                        </div>
-
-                        <button type="submit" class="btn btn-gold" style="width:100%;">
-                            Pledge Donation 💚
-                        </button>
-
-                        <div class="donate-secure-note">
-                            🔒 Your information is kept private and secure
-                        </div>
-                    </form>
-                </div>
-
-                <div class="donate-confirm" id="donate-confirm">
-                    <div class="donate-confirm-icon">🌿</div>
-                    <h3>Thank You!</h3>
-                    <p id="donate-confirm-msg">Your pledge has been recorded. We'll be in touch!</p>
-                    <button class="btn btn-outline" style="margin-top:20px;" onclick="mgResetDonation()">Make Another Pledge</button>
-                </div>
-            </div>
         </div>
     </div>
 </section>
 
 <!-- ╔══════════════════════════════════════════════════════════╗
-     ║  STRING LIGHTS FOOTER SEPARATOR                          ║
+     ║  EMT FUND                                                ║
      ╚══════════════════════════════════════════════════════════╝ -->
-<?php get_template_part('template-parts/string-lights', null, ['top' => false]); ?>
+<section class="emt-fund-section" id="emt-fund">
+    <div class="container">
+        <div class="emt-fund-inner">
+            <span class="section-label">Give the Gift of a Future</span>
+            <h2 class="section-title" style="margin-bottom:16px;">Support Maple's<br>EMT Future Fund</h2>
+            <p>Maple's journey doesn't stop at graduation. Continuing EMT education, certifications, and equipment all take resources — and every bit of support helps them get there.</p>
+            <p>If you'd like to contribute to Maple's future in emergency medicine, you can send a gift directly via Venmo. Every dollar is a vote of confidence in an incredible next chapter.</p>
+
+            <a href="<?php echo esc_url($venmo_url); ?>"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="venmo-btn">
+                <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M444.2 64c16.5 27.5 24 55.8 24 91.4 0 113.8-97.2 261.5-176.2 365.6H109.3L64 96.9l152.1-14.3 23.3 184.9c21.6-36.2 48.4-93.3 48.4-132.1 0-21.3-3.6-35.8-9.3-47.9L444.2 64z"/>
+                </svg>
+                Donate via Venmo
+            </a>
+        </div>
+    </div>
+</section>
 
 <!-- Toast container -->
 <div class="toast-container" id="toast-container"></div>
@@ -555,46 +573,46 @@ function mg_eucalyptus_svg(): string {
 function mg_get_quiz_questions(): array {
     return [
         [
-            'q' => 'What career is Maple pursuing after graduation?',
-            'opts' => ['EMT / Emergency Medical Technician', 'Nurse Practitioner', 'Firefighter', 'Paramedic'],
+            'q' => 'What certification is Maple earning alongside their high school diploma?',
+            'opts' => ['EMT / Emergency Medical Technician', 'Nurse Aide', 'Firefighter I', 'Phlebotomist'],
             'correct' => 0,
-            'fact' => 'Maple is passionate about emergency medicine and becoming a certified EMT to serve her community!',
+            'fact' => 'Maple is earning their EMT certification at the same time as graduating high school — an incredible double achievement!',
         ],
         [
-            'q' => 'What is Maple\'s favorite season?',
+            'q' => "What is Maple's favorite season?",
             'opts' => ['Summer', 'Autumn', 'Spring', 'Winter'],
             'correct' => 1,
             'fact' => 'Maple loves the golden colors and crisp air of autumn — fitting for a farm party!',
         ],
         [
-            'q' => 'If Maple could travel anywhere in the world, where would she go?',
+            'q' => 'If Maple could travel anywhere in the world, where would they go?',
             'opts' => ['Iceland', 'Italy', 'Japan', 'New Zealand'],
             'correct' => 2,
-            'fact' => 'Japan has always been at the top of Maple\'s travel bucket list!',
+            'fact' => "Japan has always been at the top of Maple's travel bucket list!",
         ],
         [
-            'q' => 'What is Maple\'s go-to comfort food?',
+            'q' => "What is Maple's go-to comfort food?",
             'opts' => ['Tacos', 'Mac and Cheese', 'Pizza', 'Ramen'],
             'correct' => 3,
-            'fact' => 'Maple never says no to a big bowl of ramen on a cold evening!',
+            'fact' => "Maple never says no to a big bowl of ramen on a cold evening!",
         ],
         [
-            'q' => 'Which best describes Maple\'s personality?',
+            'q' => "Which best describes Maple's personality?",
             'opts' => ['Calm & Introspective', 'Bold & Adventurous', 'Warm & Empathetic', 'Witty & Sarcastic'],
             'correct' => 2,
-            'fact' => 'Maple\'s warmth and empathy are exactly what makes her such a perfect fit for a career in emergency medicine.',
+            'fact' => "Maple's warmth and empathy are exactly what makes them such a perfect fit for a career in emergency medicine.",
         ],
         [
-            'q' => 'What is Maple\'s hidden talent?',
+            'q' => "What is Maple's hidden talent?",
             'opts' => ['Playing the guitar', 'Speed reading', 'Baking sourdough bread', 'Painting watercolors'],
             'correct' => 2,
-            'fact' => 'Maple can bake an amazing loaf of sourdough — she started during the pandemic and never stopped!',
+            'fact' => 'Maple can bake an amazing loaf of sourdough — they started during the pandemic and never stopped!',
         ],
         [
-            'q' => 'What\'s Maple\'s favorite way to decompress?',
+            'q' => "What's Maple's favorite way to decompress?",
             'opts' => ['Hiking outdoors', 'Watching movies', 'Reading a good book', 'Listening to podcasts'],
             'correct' => 0,
-            'fact' => 'Maple loves getting out in nature — trail walks clear her head like nothing else.',
+            'fact' => "Maple loves getting out in nature — trail walks clear their head like nothing else.",
         ],
         [
             'q' => 'Which quote best resonates with Maple?',
@@ -605,7 +623,7 @@ function mg_get_quiz_questions(): array {
                 '"You miss 100% of the shots you don\'t take."',
             ],
             'correct' => 2,
-            'fact' => 'Maple lives by this mindset — she is driven by purpose and a desire to make life better for those around her.',
+            'fact' => 'Maple lives by this mindset — driven by purpose and a desire to make life better for those around them.',
         ],
     ];
 }

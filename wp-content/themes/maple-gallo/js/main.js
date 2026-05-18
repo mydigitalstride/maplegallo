@@ -519,108 +519,89 @@ function mgLoadLeaderboard() {
 
 document.addEventListener('DOMContentLoaded', mgLoadLeaderboard);
 
-/* ── Donation Form ───────────────────────────────────────────── */
+/* ── Stories / Life Tips ─────────────────────────────────────── */
 (function () {
-    const form = document.getElementById('donation-form');
+    const form    = document.getElementById('story-form');
+    const bodyEl  = document.getElementById('story-body');
+    const charNum = document.getElementById('story-char-num');
+    const msgEl   = document.getElementById('story-submit-msg');
     if (!form) return;
 
-    // Animate goal bar on load
-    setTimeout(() => {
-        mgPost('mg_get_leaderboard', {}).catch(() => {}); // keep connection warm
-        loadGoalProgress();
-    }, 500);
-
-    function loadGoalProgress() {
-        // We'll show a static visual — real total comes from PHP on load
-        const fillEl   = document.getElementById('goal-fill');
-        const raisedEl = document.getElementById('goal-raised');
-        const goalEl   = document.getElementById('goal-target');
-        if (!fillEl) return;
-
-        // Animate whatever pct is currently set
-        const currentWidth = fillEl.style.width || '0%';
-        const pct = parseFloat(currentWidth);
-        if (pct > 0) fillEl.style.width = pct + '%';
-    }
-
-    form.addEventListener('submit', async e => {
-        e.preventDefault();
-        const submitBtn = form.querySelector('[type=submit]');
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Processing…';
-
-        const data = {
-            donor_name:  document.getElementById('donor-name').value.trim(),
-            donor_email: document.getElementById('donor-email').value.trim(),
-            amount:      document.getElementById('donate-custom-input').value,
-            message:     document.getElementById('donor-message').value.trim(),
-        };
-
-        try {
-            const res = await mgPost('mg_donate', data);
-            if (res.success) {
-                document.getElementById('donate-form-wrap').style.display = 'none';
-                const confirm = document.getElementById('donate-confirm');
-                confirm.classList.add('show');
-                document.getElementById('donate-confirm-msg').textContent = res.data.message;
-                mgToast('Thank you for your pledge! 💚', 'success');
-
-                // Update progress bar
-                if (res.data.total_raised !== undefined) {
-                    updateGoalBar(res.data.total_raised);
-                }
-            } else {
-                mgToast(res.data?.message || 'Something went wrong. Please try again.', 'error');
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Pledge Donation 💚';
-            }
-        } catch (err) {
-            mgToast('Network error. Please try again.', 'error');
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Pledge Donation 💚';
+    // Character counter
+    bodyEl?.addEventListener('input', () => {
+        const len = bodyEl.value.length;
+        if (charNum) {
+            charNum.textContent = len;
+            charNum.parentElement.classList.toggle('over', len > 800);
         }
     });
 
-    function updateGoalBar(raised) {
-        const goalText = document.getElementById('goal-target')?.textContent || '';
-        const goalMatch = goalText.match(/\$([\d,]+)/);
-        const goal = goalMatch ? parseFloat(goalMatch[1].replace(',','')) : 2000;
-        const pct  = Math.min(100, Math.round((raised / goal) * 100));
+    form.addEventListener('submit', async e => {
+        e.preventDefault();
+        const btn = form.querySelector('[type=submit]');
+        btn.disabled = true;
+        btn.textContent = 'Sharing…';
+        if (msgEl) { msgEl.textContent = ''; msgEl.className = 'story-submit-msg'; }
 
-        const fillEl   = document.getElementById('goal-fill');
-        const raisedEl = document.getElementById('goal-raised');
-        if (fillEl)   fillEl.style.width = pct + '%';
-        if (raisedEl) raisedEl.textContent = `$${raised.toLocaleString('en-US', {minimumFractionDigits:2,maximumFractionDigits:2})} raised`;
-    }
+        const data = {
+            author: document.getElementById('story-author')?.value.trim() || '',
+            title:  document.getElementById('story-title')?.value.trim()  || '',
+            body:   bodyEl?.value.trim() || '',
+        };
+
+        try {
+            const res = await mgPost('mg_submit_story', data);
+            if (res.success) {
+                if (msgEl) { msgEl.textContent = res.data.message; msgEl.className = 'story-submit-msg success'; }
+                mgToast('Your tip has been shared! 🌿', 'success');
+                form.reset();
+                if (charNum) charNum.textContent = '0';
+                mgPrependStoryCard(res.data.story);
+            } else {
+                if (msgEl) { msgEl.textContent = res.data?.message || 'Something went wrong.'; msgEl.className = 'story-submit-msg error'; }
+                mgToast(res.data?.message || 'Could not submit. Please try again.', 'error');
+            }
+        } catch {
+            if (msgEl) { msgEl.textContent = 'Network error. Please try again.'; msgEl.className = 'story-submit-msg error'; }
+            mgToast('Network error. Please try again.', 'error');
+        }
+
+        btn.disabled = false;
+        btn.textContent = 'Leave My Tip ✨';
+    });
 })();
 
-function mgSelectAmount(btn, amount) {
-    document.querySelectorAll('.donate-amount-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    const input = document.getElementById('donate-custom-input');
-    if (input) {
-        if (amount > 0) {
-            input.value = amount;
-            input.closest('.form-group').style.display = 'none';
-        } else {
-            input.value = '';
-            input.closest('.form-group').style.display = '';
-            input.focus();
-        }
-    }
+function mgPrependStoryCard(s) {
+    const container = document.getElementById('story-cards');
+    if (!container) return;
+    const empty = document.getElementById('story-empty');
+    if (empty) empty.remove();
+
+    const long = s.body.length > 200;
+    const div  = document.createElement('div');
+    div.className = 'story-card';
+    div.innerHTML = `
+        ${s.title ? `<div class="story-card-title">${mgEscape(s.title)}</div>` : ''}
+        <div class="story-card-text ${long ? 'collapsed' : ''}" id="sc-${s.id}">${mgEscape(s.body)}</div>
+        ${long ? `<button class="story-card-expand" onclick="mgExpandStory('sc-${s.id}', this)">Read more</button>` : ''}
+        <div class="story-card-meta">
+            <span class="story-card-author">— ${mgEscape(s.author)}</span>
+            <span class="story-card-date">${mgEscape(s.date)}</span>
+        </div>`;
+    container.prepend(div);
 }
 
-// Init: hide custom amount row since $50 is pre-selected
-document.addEventListener('DOMContentLoaded', () => {
-    const customRow = document.getElementById('donate-custom-input')?.closest('.form-group');
-    if (customRow) customRow.style.display = 'none';
-});
+function mgExpandStory(id, btn) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove('collapsed');
+    btn.remove();
+}
 
-function mgResetDonation() {
-    document.getElementById('donate-form-wrap').style.display = '';
-    document.getElementById('donate-confirm').classList.remove('show');
-    document.getElementById('donation-form').reset();
-    // Re-select $50 default
-    const defaultBtn = document.querySelector('[data-amount="50"]');
-    if (defaultBtn) mgSelectAmount(defaultBtn, 50);
+function mgEscape(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
 }

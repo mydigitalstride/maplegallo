@@ -60,18 +60,18 @@ add_action('init', function () {
     ]);
 });
 
-// ── Custom Post Type: Donations ──────────────────────────────
+// ── Custom Post Type: Stories / Tips ─────────────────────────
 add_action('init', function () {
-    register_post_type('mg_donation', [
+    register_post_type('mg_story', [
         'labels' => [
-            'name'          => 'Donations',
-            'singular_name' => 'Donation',
+            'name'          => 'Stories & Tips',
+            'singular_name' => 'Story',
         ],
         'public'       => false,
         'show_ui'      => true,
         'show_in_menu' => true,
         'supports'     => ['title','custom-fields'],
-        'menu_icon'    => 'dashicons-heart',
+        'menu_icon'    => 'dashicons-format-quote',
     ]);
 });
 
@@ -260,82 +260,75 @@ function mg_get_leaderboard() {
     wp_send_json_success(['scores' => $data]);
 }
 
-// ── AJAX: Donation ───────────────────────────────────────────
-add_action('wp_ajax_nopriv_mg_donate', 'mg_handle_donation');
-add_action('wp_ajax_mg_donate',        'mg_handle_donation');
+// ── AJAX: Submit Story / Life Tip ────────────────────────────
+add_action('wp_ajax_nopriv_mg_submit_story', 'mg_submit_story');
+add_action('wp_ajax_mg_submit_story',        'mg_submit_story');
 
-function mg_handle_donation() {
+function mg_submit_story() {
     check_ajax_referer('maple_gallo_nonce', 'nonce');
 
-    $name    = sanitize_text_field($_POST['donor_name'] ?? '');
-    $email   = sanitize_email($_POST['donor_email'] ?? '');
-    $amount  = floatval($_POST['amount'] ?? 0);
-    $message = sanitize_textarea_field($_POST['message'] ?? '');
+    $author = sanitize_text_field($_POST['author'] ?? '');
+    $title  = sanitize_text_field($_POST['title']  ?? '');
+    $body   = sanitize_textarea_field($_POST['body'] ?? '');
 
-    if (empty($name)) wp_send_json_error(['message' => 'Please enter your name.']);
-    if ($amount < 1)  wp_send_json_error(['message' => 'Please enter a valid amount.']);
+    if (empty($author)) wp_send_json_error(['message' => 'Please enter your name.']);
+    if (empty($body))   wp_send_json_error(['message' => 'Please write your tip or story.']);
+    if (mb_strlen($body) > 800) wp_send_json_error(['message' => 'Story must be 800 characters or fewer.']);
 
-    // Record donation (payment processor integration goes here)
     $post_id = wp_insert_post([
-        'post_type'   => 'mg_donation',
-        'post_title'  => $name . ' — $' . number_format($amount, 2),
+        'post_type'   => 'mg_story',
+        'post_title'  => $author,
         'post_status' => 'publish',
         'meta_input'  => [
-            '_mg_donor_name'  => $name,
-            '_mg_donor_email' => $email,
-            '_mg_amount'      => $amount,
-            '_mg_message'     => $message,
-            '_mg_donated_at'  => current_time('mysql'),
-            '_mg_status'      => 'pending_payment',
+            '_mg_story_title' => $title,
+            '_mg_story_body'  => $body,
+            '_mg_submitted_at'=> current_time('mysql'),
         ],
     ]);
 
-    // Send notification email to admin
-    $admin_email = get_option('admin_email');
-    wp_mail(
-        $admin_email,
-        'New Donation Pledge — Maple Gallo Graduation',
-        sprintf(
-            "%s has pledged \$%s to Maple's EMT fund.\n\nMessage: %s\n\nEmail: %s\n\nPlease follow up to collect payment.",
-            $name,
-            number_format($amount, 2),
-            $message ?: '(none)',
-            $email
-        )
-    );
-
-    // Thank-you email to donor
-    if (!empty($email)) {
-        wp_mail(
-            $email,
-            'Thank you for supporting Maple\'s EMT Future Fund!',
-            sprintf(
-                "Hi %s,\n\nThank you for pledging \$%s to Maple's EMT Future Fund!\n\nYour generosity means the world to us. We'll be in touch about collecting your donation.\n\nWith gratitude,\nThe Gallo Family",
-                $name,
-                number_format($amount, 2)
-            )
-        );
+    if (is_wp_error($post_id)) {
+        wp_send_json_error(['message' => 'Could not save your story. Please try again.']);
     }
 
-    $total_raised = mg_get_total_raised();
-
     wp_send_json_success([
-        'message'      => "Thank you, $name! Your pledge of \$$amount has been recorded.",
-        'total_raised' => $total_raised,
+        'message' => "Thank you, $author! Your tip has been shared.",
+        'story'   => [
+            'id'     => $post_id,
+            'author' => $author,
+            'title'  => $title,
+            'body'   => $body,
+            'date'   => date('M j'),
+        ],
     ]);
 }
 
-// ── Donation total helper ─────────────────────────────────────
-function mg_get_total_raised(): float {
-    global $wpdb;
-    $total = $wpdb->get_var(
-        "SELECT SUM(meta_value) FROM {$wpdb->postmeta}
-         INNER JOIN {$wpdb->posts} ON {$wpdb->posts}.ID = {$wpdb->postmeta}.post_id
-         WHERE {$wpdb->posts}.post_type = 'mg_donation'
-           AND {$wpdb->posts}.post_status = 'publish'
-           AND {$wpdb->postmeta}.meta_key = '_mg_amount'"
-    );
-    return (float) ($total ?? 0);
+// ── AJAX: Get Stories ─────────────────────────────────────────
+add_action('wp_ajax_nopriv_mg_get_stories', 'mg_get_stories');
+add_action('wp_ajax_mg_get_stories',        'mg_get_stories');
+
+function mg_get_stories() {
+    check_ajax_referer('maple_gallo_nonce', 'nonce');
+
+    $stories = get_posts([
+        'post_type'      => 'mg_story',
+        'post_status'    => 'publish',
+        'posts_per_page' => 40,
+        'orderby'        => 'date',
+        'order'          => 'DESC',
+    ]);
+
+    $data = [];
+    foreach ($stories as $s) {
+        $data[] = [
+            'id'     => $s->ID,
+            'author' => $s->post_title,
+            'title'  => get_post_meta($s->ID, '_mg_story_title', true),
+            'body'   => get_post_meta($s->ID, '_mg_story_body',  true),
+            'date'   => get_the_date('M j', $s),
+        ];
+    }
+
+    wp_send_json_success(['stories' => $data]);
 }
 
 // ── Settings Page ─────────────────────────────────────────────
@@ -354,17 +347,19 @@ add_action('admin_menu', function () {
 function mg_settings_page() {
     if (isset($_POST['mg_save_settings'])) {
         check_admin_referer('mg_settings');
-        update_option('maple_party_date',   sanitize_text_field($_POST['party_date'] ?? ''));
-        update_option('maple_party_venue',  sanitize_text_field($_POST['party_venue'] ?? ''));
-        update_option('maple_party_goal',   floatval($_POST['party_goal'] ?? 2000));
-        update_option('maple_about_text',   sanitize_textarea_field($_POST['about_text'] ?? ''));
+        update_option('maple_party_date',  sanitize_text_field($_POST['party_date']  ?? ''));
+        update_option('maple_party_venue', sanitize_text_field($_POST['party_venue'] ?? ''));
+        update_option('maple_venmo_url',   esc_url_raw($_POST['venmo_url']           ?? ''));
+        update_option('maple_about_text',  sanitize_textarea_field($_POST['about_text'] ?? ''));
         echo '<div class="updated"><p>Settings saved!</p></div>';
     }
 
-    $date  = get_option('maple_party_date',  '2026-06-15T18:00:00');
-    $venue = get_option('maple_party_venue', 'The Old Oak Farm, 123 Country Lane');
-    $goal  = get_option('maple_party_goal',  2000);
-    $about = get_option('maple_about_text',  "Maple Gallo is officially a graduate! After years of hard work, late nights studying, and an unstoppable drive to serve her community, Maple has earned her degree and is on her way to becoming a certified EMT.\n\nJoin us as we celebrate this incredible milestone at a rustic farm gathering filled with good food, great music, and even better company.");
+    $date     = get_option('maple_party_date',  '2026-06-15T18:00:00');
+    $venue    = get_option('maple_party_venue', 'The Old Oak Farm');
+    $venmo    = get_option('maple_venmo_url',   'https://venmo.com/maplegallo');
+    $about    = get_option('maple_about_text',  "Maple Gallo is officially a graduate! After years of hard work, late nights studying, and an unstoppable drive to serve their community, Maple has earned their high school diploma and their EMT Certification — at the same time.\n\nJoin us as we celebrate this incredible double milestone at a rustic farm gathering filled with good food, great music, and even better company.");
+
+    $story_count = wp_count_posts('mg_story')->publish ?? 0;
 
     ?>
     <div class="wrap">
@@ -381,8 +376,11 @@ function mg_settings_page() {
                     <td><input type="text" name="party_venue" value="<?php echo esc_attr($venue); ?>" class="regular-text"></td>
                 </tr>
                 <tr>
-                    <th>Donation Goal ($)</th>
-                    <td><input type="number" name="party_goal" value="<?php echo esc_attr($goal); ?>" step="100" min="0" class="small-text"></td>
+                    <th>Venmo Link (EMT Fund)</th>
+                    <td>
+                        <input type="url" name="venmo_url" value="<?php echo esc_attr($venmo); ?>" class="regular-text" placeholder="https://venmo.com/username">
+                        <p class="description">Full Venmo profile URL — e.g. https://venmo.com/Maple-Gallo</p>
+                    </td>
                 </tr>
                 <tr>
                     <th>About Maple</th>
@@ -395,8 +393,9 @@ function mg_settings_page() {
         </form>
 
         <hr>
-        <h2>Donation Summary</h2>
-        <p><strong>Total Raised:</strong> $<?php echo number_format(mg_get_total_raised(), 2); ?> of $<?php echo number_format((float) get_option('maple_party_goal', 2000), 2); ?> goal</p>
+        <h2>Stories &amp; Tips</h2>
+        <p><strong><?php echo (int) $story_count; ?></strong> stories have been shared so far.</p>
+        <a href="<?php echo admin_url('edit.php?post_type=mg_story'); ?>" class="button">Manage Stories</a>
     </div>
     <?php
 }

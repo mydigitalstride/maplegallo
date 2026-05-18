@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Maple Gallo Graduation — Preview</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="wp-content/themes/maple-gallo/style.css">
+    <style>
+        /* Preview-only overrides for demo without WordPress AJAX */
+        .upload-section .pending-uploads-section { display: none; }
+    </style>
+</head>
+<body>
+
+<!-- ── HEADER ─────────────────────────────────── -->
+<header class="site-header" id="site-header">
+    <div class="container header-inner">
+        <a class="site-logo" href="#home">🌿 <span>Maple</span> Gallo</a>
+        <nav class="site-nav" id="site-nav" aria-label="Primary">
+            <ul>
+                <li><a href="#about">Her Story</a></li>
+                <li><a href="#schedule">Schedule</a></li>
+                <li><a href="#gallery">Gallery</a></li>
+                <li><a href="#upload">Share a Photo</a></li>
+                <li><a href="#quiz">Trivia</a></li>
+                <li><a href="#leaderboard">Leaderboard</a></li>
+                <li><a href="#donate" class="nav-cta">Donate 💚</a></li>
+            </ul>
+        </nav>
+        <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu" aria-expanded="false">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+</header>
+<div style="height:64px;"></div>
+
+<!-- ── HERO ──────────────────────────────────── -->
+<section class="hero" id="home">
+    <!-- String lights -->
+    <div class="hero-lights">
+        <svg viewBox="0 0 1440 120" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+            <defs>
+                <radialGradient id="g1" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#fff8dc"/>
+                    <stop offset="100%" stop-color="#c8a96e" stop-opacity="0"/>
+                </radialGradient>
+            </defs>
+            <path d="M0 10 Q180 45 360 10 Q540 -20 720 10 Q900 40 1080 10 Q1260 -20 1440 10" stroke="#4a2c0a" stroke-width="2" fill="none" opacity=".7"/>
+            <line x1="0"    y1="10"  x2="0"    y2="26"  stroke="#4a2c0a" stroke-width="1.5"/>
+            <line x1="360"  y1="10"  x2="360"  y2="26"  stroke="#4a2c0a" stroke-width="1.5"/>
+            <line x1="720"  y1="10"  x2="720"  y2="26"  stroke="#4a2c0a" stroke-width="1.5"/>
+            <line x1="1080" y1="10"  x2="1080" y2="26"  stroke="#4a2c0a" stroke-width="1.5"/>
+            <line x1="1440" y1="10"  x2="1440" y2="26"  stroke="#4a2c0a" stroke-width="1.5"/>
+            <ellipse cx="0"    cy="36" rx="8" ry="12" fill="#fff8dc" opacity=".95"/>
+            <ellipse cx="360"  cy="36" rx="8" ry="12" fill="#fff8dc" opacity=".95"/>
+            <ellipse cx="720"  cy="36" rx="8" ry="12" fill="#fff8dc" opacity=".95"/>
+            <ellipse cx="1080" cy="36" rx="8" ry="12" fill="#fff8dc" opacity=".95"/>
+            <ellipse cx="1440" cy="36" rx="8" ry="12" fill="#fff8dc" opacity=".95"/>
+            <ellipse cx="0"    cy="36" rx="14" ry="18" fill="url(#g1)" opacity=".5"/>
+            <ellipse cx="360"  cy="36" rx="14" ry="18" fill="url(#g1)" opacity=".5"/>
+            <ellipse cx="720"  cy="36" rx="14" ry="18" fill="url(#g1)" opacity=".5"/>
+            <ellipse cx="1080" cy="36" rx="14" ry="18" fill="url(#g1)" opacity=".5"/>
+        </svg>
+    </div>
+
+    <div class="hero-eucalyptus-left" aria-hidden="true">
+        <svg viewBox="0 0 200 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M100 480 C90 400 60 350 40 280 C20 210 30 140 100 80" stroke="#7a9e87" stroke-width="3" fill="none"/>
+            <ellipse cx="55" cy="160" rx="28" ry="18" fill="#7a9e87" opacity=".7" transform="rotate(-30 55 160)"/>
+            <ellipse cx="42" cy="220" rx="32" ry="20" fill="#b2cdb9" opacity=".6" transform="rotate(20 42 220)"/>
+            <ellipse cx="60" cy="290" rx="30" ry="19" fill="#7a9e87" opacity=".65" transform="rotate(-15 60 290)"/>
+            <ellipse cx="45" cy="350" rx="26" ry="16" fill="#a8c4a2" opacity=".7" transform="rotate(25 45 350)"/>
+            <ellipse cx="80" cy="120" rx="24" ry="15" fill="#b2cdb9" opacity=".6" transform="rotate(-40 80 120)"/>
+            <ellipse cx="70" cy="400" rx="22" ry="14" fill="#7a9e87" opacity=".6" transform="rotate(10 70 400)"/>
+        </svg>
+    </div>
+    <div class="hero-eucalyptus-right" aria-hidden="true">
+        <svg viewBox="0 0 200 500" fill="none" xmlns="http://www.w3.org/2000/svg" style="transform:scaleX(-1)">
+            <path d="M100 480 C90 400 60 350 40 280 C20 210 30 140 100 80" stroke="#7a9e87" stroke-width="3" fill="none"/>
+            <ellipse cx="55" cy="160" rx="28" ry="18" fill="#7a9e87" opacity=".7" transform="rotate(-30 55 160)"/>
+            <ellipse cx="42" cy="220" rx="32" ry="20" fill="#b2cdb9" opacity=".6" transform="rotate(20 42 220)"/>
+            <ellipse cx="60" cy="290" rx="30" ry="19" fill="#7a9e87" opacity=".65" transform="rotate(-15 60 290)"/>
+            <ellipse cx="45" cy="350" rx="26" ry="16" fill="#a8c4a2" opacity=".7" transform="rotate(25 45 350)"/>
+            <ellipse cx="80" cy="120" rx="24" ry="15" fill="#b2cdb9" opacity=".6" transform="rotate(-40 80 120)"/>
+            <ellipse cx="70" cy="400" rx="22" ry="14" fill="#7a9e87" opacity=".6" transform="rotate(10 70 400)"/>
+        </svg>
+    </div>
+
+    <div class="hero-content">
+        <span class="hero-eyebrow">You're Invited to Celebrate</span>
+        <h1 class="hero-title">
+            Congratulations
+            <span class="hero-title-name">Maple Gallo</span>
+        </h1>
+        <p class="hero-subtitle">Class of 2026 &nbsp;·&nbsp; EMT Graduate</p>
+
+        <div class="hero-details">
+            <div class="hero-detail">
+                <span class="hero-detail-icon">📅</span>
+                <span class="hero-detail-label">Date</span>
+                <span class="hero-detail-value">June 15, 2026</span>
+            </div>
+            <div class="hero-detail">
+                <span class="hero-detail-icon">🕕</span>
+                <span class="hero-detail-label">Time</span>
+                <span class="hero-detail-value">6:00 PM</span>
+            </div>
+            <div class="hero-detail">
+                <span class="hero-detail-icon">🌾</span>
+                <span class="hero-detail-label">Venue</span>
+                <span class="hero-detail-value">The Old Oak Farm</span>
+            </div>
+        </div>
+
+        <div class="hero-actions">
+            <a href="#gallery" class="btn btn-primary">See the Gallery</a>
+            <a href="#donate" class="btn btn-outline">Support the EMT Fund</a>
+        </div>
+    </div>
+
+    <div class="hero-divider">
+        <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+            <path d="M0 60 L1440 0 L1440 60 Z" fill="#8b5e3c" opacity=".15"/>
+            <path d="M0 60 Q360 20 720 40 Q1080 60 1440 20 L1440 60 Z" fill="#faf8f2"/>
+        </svg>
+    </div>
+</section>
+
+<!-- ── COUNTDOWN ─────────────────────────────── -->
+<section class="countdown-bar" id="countdown">
+    <h3>Counting down to the celebration</h3>
+    <div class="countdown-units">
+        <div class="countdown-unit"><span class="countdown-number" id="cd-days">--</span><span class="countdown-label">Days</span></div>
+        <div class="countdown-unit"><span class="countdown-number" id="cd-hours">--</span><span class="countdown-label">Hours</span></div>
+        <div class="countdown-unit"><span class="countdown-number" id="cd-minutes">--</span><span class="countdown-label">Minutes</span></div>
+        <div class="countdown-unit"><span class="countdown-number" id="cd-seconds">--</span><span class="countdown-label">Seconds</span></div>
+    </div>
+</section>
+
+<!-- ── ABOUT ──────────────────────────────────── -->
+<section class="about-section section-pad" id="about">
+    <div class="container">
+        <div class="about-grid">
+            <div class="about-img-wrap">
+                <img src="https://placehold.co/480x600/7a9e87/fff?text=Maple+🌿" alt="Maple Gallo">
+                <div class="about-img-badge"><span class="badge-year">2026</span>Graduate</div>
+            </div>
+            <div class="about-text">
+                <span class="section-label">Her Story</span>
+                <h2 class="section-title">From Student<br>to EMT Hero</h2>
+                <p>Maple Gallo is officially a graduate! After years of hard work, late nights studying, and an unstoppable drive to serve her community, Maple has earned her degree and is on her way to becoming a certified EMT.</p>
+                <p>Join us as we celebrate this incredible milestone at a rustic farm gathering filled with good food, great music, and even better company.</p>
+                <div class="about-stats">
+                    <div class="about-stat"><span class="about-stat-number">4+</span><span class="about-stat-label">Years of Study</span></div>
+                    <div class="about-stat"><span class="about-stat-number">EMT</span><span class="about-stat-label">Certified</span></div>
+                    <div class="about-stat"><span class="about-stat-number">∞</span><span class="about-stat-label">Lives to Impact</span></div>
+                    <div class="about-stat"><span class="about-stat-number">🌿</span><span class="about-stat-label">Farm Party!</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── SCHEDULE ───────────────────────────────── -->
+<section class="schedule-section section-pad" id="schedule">
+    <div class="container text-center">
+        <span class="section-label">Plan Your Evening</span>
+        <h2 class="section-title">Party Schedule</h2>
+        <p class="section-subtitle">An evening under the lights at the farm — good food, great music, and great memories.</p>
+        <div class="timeline">
+            <div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-time">6:00 PM</div><div class="timeline-title">Guests Arrive</div><div class="timeline-desc">Welcome drinks &amp; mingle under the string lights</div></div>
+            <div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-time">6:30 PM</div><div class="timeline-title">Dinner Is Served</div><div class="timeline-desc">Farm-to-table feast at the wooden tables</div></div>
+            <div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-time">7:30 PM</div><div class="timeline-title">Toasts &amp; Speeches</div><div class="timeline-desc">Celebrating Maple's incredible journey</div></div>
+            <div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-time">8:00 PM</div><div class="timeline-title">Maple Gallo Trivia!</div><div class="timeline-desc">Test your knowledge — compete for the top spot on the leaderboard</div></div>
+            <div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-time">8:30 PM</div><div class="timeline-title">Dancing &amp; Music</div><div class="timeline-desc">Live music and dancing under the stars</div></div>
+            <div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-time">9:30 PM</div><div class="timeline-title">Cake &amp; Desserts</div><div class="timeline-desc">Sweet endings to a perfect night</div></div>
+            <div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-time">10:00 PM</div><div class="timeline-title">Photo Booth Open</div><div class="timeline-desc">Capture the memories &amp; upload your favorites</div></div>
+        </div>
+    </div>
+</section>
+
+<!-- ── GALLERY ────────────────────────────────── -->
+<section class="gallery-section section-pad" id="gallery">
+    <div class="container">
+        <div class="text-center">
+            <span class="section-label">Memories</span>
+            <h2 class="section-title">Photo Gallery</h2>
+            <p class="section-subtitle">A collection of Maple's best moments — from childhood adventures to graduation day.</p>
+        </div>
+
+        <div class="gallery-filters" id="gallery-filters">
+            <button class="gallery-filter active" data-cat="all">All Photos</button>
+            <button class="gallery-filter" data-cat="childhood">Childhood</button>
+            <button class="gallery-filter" data-cat="school">School Life</button>
+            <button class="gallery-filter" data-cat="emt">EMT Training</button>
+            <button class="gallery-filter" data-cat="friends">Friends &amp; Family</button>
+            <button class="gallery-filter" data-cat="party">Party Uploads</button>
+        </div>
+
+        <div class="gallery-grid" id="gallery-grid">
+            <div class="gallery-item" data-cat="childhood" data-full="https://placehold.co/900x700/b2cdb9/fff?text=Childhood" data-caption="Childhood Adventures">
+                <img src="https://placehold.co/400x400/b2cdb9/fff?text=Childhood" alt="Childhood" loading="lazy">
+                <div class="gallery-overlay"><span class="gallery-overlay-text">Childhood Adventures</span></div>
+            </div>
+            <div class="gallery-item" data-cat="school" data-full="https://placehold.co/900x700/c9956c/fff?text=School+Days" data-caption="School Days">
+                <img src="https://placehold.co/400x480/c9956c/fff?text=School+Days" alt="School Days" loading="lazy">
+                <div class="gallery-overlay"><span class="gallery-overlay-text">School Days</span></div>
+            </div>
+            <div class="gallery-item" data-cat="school" data-full="https://placehold.co/900x700/7a9e87/fff?text=Study+Nights" data-caption="Study Nights">
+                <img src="https://placehold.co/400x400/7a9e87/fff?text=Study+Nights" alt="Study Nights" loading="lazy">
+                <div class="gallery-overlay"><span class="gallery-overlay-text">Study Nights</span></div>
+            </div>
+            <div class="gallery-item" data-cat="emt" data-full="https://placehold.co/900x700/4e7260/fff?text=EMT+Training" data-caption="EMT Training">
+                <img src="https://placehold.co/400x360/4e7260/fff?text=EMT+Training" alt="EMT Training" loading="lazy">
+                <div class="gallery-overlay"><span class="gallery-overlay-text">EMT Training</span></div>
+            </div>
+            <div class="gallery-item" data-cat="friends" data-full="https://placehold.co/900x700/8b5e3c/fff?text=Best+Friends" data-caption="Best Friends Forever">
+                <img src="https://placehold.co/400x400/8b5e3c/fff?text=Best+Friends" alt="Best Friends" loading="lazy">
+                <div class="gallery-overlay"><span class="gallery-overlay-text">Best Friends Forever</span></div>
+            </div>
+            <div class="gallery-item" data-cat="friends" data-full="https://placehold.co/900x700/a8c4a2/fff?text=Family+Fun" data-caption="Family Memories">
+                <img src="https://placehold.co/400x480/a8c4a2/fff?text=Family+Fun" alt="Family" loading="lazy">
+                <div class="gallery-overlay"><span class="gallery-overlay-text">Family Memories</span></div>
+            </div>
+            <div class="gallery-item" data-cat="childhood" data-full="https://placehold.co/900x700/c8a96e/fff?text=Little+Maple" data-caption="Little Maple">
+                <img src="https://placehold.co/400x400/c8a96e/fff?text=Little+Maple" alt="Little Maple" loading="lazy">
+                <div class="gallery-overlay"><span class="gallery-overlay-text">Little Maple</span></div>
+            </div>
+            <div class="gallery-item" data-cat="emt" data-full="https://placehold.co/900x700/4a2c0a/fff?text=Graduation+Day" data-caption="Graduation Day!">
+                <img src="https://placehold.co/400x360/4a2c0a/fff?text=Graduation+Day" alt="Graduation" loading="lazy">
+                <div class="gallery-overlay"><span class="gallery-overlay-text">Graduation Day! 🎓</span></div>
+            </div>
+            <div class="gallery-item" data-cat="party" data-full="https://placehold.co/900x700/7a9e87/fff?text=Farm+Party" data-caption="Farm Party Vibes">
+                <img src="https://placehold.co/400x400/7a9e87/fff?text=Farm+Party+🌿" alt="Farm Party" loading="lazy">
+                <div class="gallery-overlay"><span class="gallery-overlay-text">Farm Party Vibes 🌿</span></div>
+            </div>
+        </div>
+
+        <div class="text-center" style="margin-top:40px;">
+            <button class="btn btn-outline" id="load-more-photos">Load More</button>
+        </div>
+    </div>
+</section>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Photo lightbox">
+    <div class="lightbox-inner">
+        <button class="lightbox-close" id="lightbox-close" aria-label="Close">&times;</button>
+        <button class="lightbox-nav lightbox-prev" id="lightbox-prev" aria-label="Previous">&#8249;</button>
+        <img class="lightbox-img" id="lightbox-img" src="" alt="">
+        <button class="lightbox-nav lightbox-next" id="lightbox-next" aria-label="Next">&#8250;</button>
+        <div class="lightbox-caption" id="lightbox-caption"></div>
+    </div>
+</div>
+
+<!-- ── UPLOAD ──────────────────────────────────── -->
+<section class="upload-section section-pad" id="upload">
+    <div class="container">
+        <div class="text-center">
+            <span class="section-label">Share Your Memories</span>
+            <h2 class="section-title">Upload Your Favorite<br>Photo of Maple</h2>
+            <p class="section-subtitle">Have a special photo of Maple? Share it with everyone! All uploads are reviewed before appearing in the gallery.</p>
+        </div>
+
+        <div class="upload-box" id="upload-drop-zone">
+            <span class="upload-icon">📸</span>
+            <h3>Drop your photo here</h3>
+            <p>or click to browse — JPEG, PNG, WebP up to 10 MB</p>
+
+            <form class="upload-form" id="photo-upload-form">
+                <div class="form-group">
+                    <label for="uploader-name">Your Name <span style="color:#c0392b">*</span></label>
+                    <input type="text" id="uploader-name" name="uploader_name" placeholder="e.g. Grandma Karen" required>
+                </div>
+                <div class="form-group">
+                    <label for="photo-caption">Caption / Memory</label>
+                    <textarea id="photo-caption" name="caption" placeholder="Share a little memory about this photo…" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Photo <span style="color:#c0392b">*</span></label>
+                    <label class="file-input-label" for="photo-file">
+                        <span>📁</span>
+                        <span id="file-label-text">Choose a photo…</span>
+                        <input type="file" id="photo-file" name="photo" accept="image/jpeg,image/png,image/gif,image/webp">
+                    </label>
+                    <div class="upload-preview" id="upload-preview"></div>
+                </div>
+                <div class="upload-progress" id="upload-progress"><div class="upload-progress-bar" id="upload-progress-bar"></div></div>
+                <div class="upload-message" id="upload-message"></div>
+                <button type="button" class="btn btn-primary" style="width:100%;" onclick="demoUpload()">Upload Photo ✨</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- ── QUIZ ───────────────────────────────────── -->
+<section class="quiz-section section-pad" id="quiz">
+    <div class="container">
+        <div class="text-center">
+            <span class="section-label">How Well Do You Know Her?</span>
+            <h2 class="section-title">Maple Gallo Trivia</h2>
+            <p class="section-subtitle">Test your knowledge and compete for the top spot on the leaderboard!</p>
+        </div>
+
+        <div class="quiz-card" id="quiz-card">
+            <div class="quiz-start" id="quiz-start">
+                <h3>Ready to play?</h3>
+                <p>Answer 8 questions about Maple and see how you stack up!</p>
+                <input type="text" class="quiz-name-input" id="quiz-player-name" placeholder="Enter your name to start…" maxlength="40">
+                <button class="btn btn-gold" onclick="mgStartQuiz()">Start the Quiz!</button>
+            </div>
+
+            <div id="quiz-game" style="display:none;">
+                <div class="quiz-progress-wrap">
+                    <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="quiz-progress-fill" style="width:0%"></div></div>
+                    <span class="quiz-progress-text" id="quiz-progress-text">Question 1 of 8</span>
+                </div>
+                <div class="quiz-question-number" id="quiz-q-number">Question 1</div>
+                <div class="quiz-question-text" id="quiz-q-text"></div>
+                <div class="quiz-options" id="quiz-options"></div>
+                <div class="quiz-feedback" id="quiz-feedback"></div>
+                <div class="quiz-nav">
+                    <span id="quiz-score-display" style="color:var(--gold);font-weight:700;">Score: 0</span>
+                    <button class="btn btn-gold" id="quiz-next-btn" onclick="mgNextQuestion()" style="display:none;">Next Question →</button>
+                </div>
+            </div>
+
+            <div class="quiz-results" id="quiz-results" style="display:none;">
+                <div class="quiz-score-circle">
+                    <span class="quiz-score-number" id="result-score">0</span>
+                    <span class="quiz-score-label" id="result-label">/ 8</span>
+                </div>
+                <div class="quiz-result-msg" id="result-msg"></div>
+                <p class="quiz-result-sub" id="result-sub"></p>
+                <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+                    <button class="btn btn-gold" onclick="mgRestartQuiz()">Play Again</button>
+                    <a href="#leaderboard" class="btn btn-outline" style="color:var(--gold-lt);border-color:var(--gold);">View Leaderboard</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── LEADERBOARD ────────────────────────────── -->
+<section class="leaderboard-section section-pad" id="leaderboard">
+    <div class="container">
+        <div class="text-center">
+            <span class="section-label">Top Players</span>
+            <h2 class="section-title">Trivia Leaderboard</h2>
+            <p class="section-subtitle">The Maple Gallo experts — can you climb to the top?</p>
+        </div>
+        <div class="leaderboard-table-wrap">
+            <div class="leaderboard-header">
+                <span>#</span><span>Name</span>
+                <span style="text-align:center;">Score</span>
+                <span style="text-align:center;">Date</span>
+            </div>
+            <div id="leaderboard-body">
+                <div class="leaderboard-empty"><p>Play the trivia quiz to appear on the leaderboard! 🏆</p></div>
+            </div>
+        </div>
+        <div class="text-center" style="margin-top:24px;">
+            <button class="btn btn-outline" onclick="mgLoadLeaderboard()">Refresh Leaderboard</button>
+        </div>
+    </div>
+</section>
+
+<!-- ── DONATE ─────────────────────────────────── -->
+<section class="donate-section section-pad" id="donate">
+    <div class="container">
+        <div class="text-center">
+            <span class="section-label">Give the Gift of a Future</span>
+            <h2 class="section-title">Support Maple's<br>EMT Future Fund</h2>
+            <p class="section-subtitle">Help Maple pursue her dream of serving her community as an EMT.</p>
+        </div>
+
+        <div class="donate-grid">
+            <div class="donate-story">
+                <h3>Why the EMT Fund?</h3>
+                <p>Maple's journey to becoming an EMT doesn't stop at graduation. There are certifications, equipment, continuing education, and so much more ahead of her.</p>
+                <p>Your generous contribution goes directly toward supporting Maple's path as she steps into a career dedicated to saving lives and making a difference every single day.</p>
+                <p>Every dollar — big or small — is a vote of confidence in her incredible future.</p>
+                <div class="donate-goal">
+                    <div class="donate-goal-label">Community Goal</div>
+                    <div class="donate-goal-amounts">
+                        <span class="donate-goal-raised" id="goal-raised">$350 raised</span>
+                        <span id="goal-target">of $2,000</span>
+                    </div>
+                    <div class="donate-goal-bar">
+                        <div class="donate-goal-fill" id="goal-fill" style="width:17.5%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="donate-form-card">
+                <h3>Make a Pledge</h3>
+                <p>Choose an amount or enter your own. We'll follow up to arrange payment.</p>
+                <div id="donate-form-wrap">
+                    <div class="donate-amounts">
+                        <button class="donate-amount-btn" data-amount="25" onclick="mgSelectAmount(this,25)">$25</button>
+                        <button class="donate-amount-btn active" data-amount="50" onclick="mgSelectAmount(this,50)">$50</button>
+                        <button class="donate-amount-btn" data-amount="100" onclick="mgSelectAmount(this,100)">$100</button>
+                        <button class="donate-amount-btn" data-amount="250" onclick="mgSelectAmount(this,250)">$250</button>
+                        <button class="donate-amount-btn" data-amount="500" onclick="mgSelectAmount(this,500)">$500</button>
+                        <button class="donate-amount-btn" data-amount="0" onclick="mgSelectAmount(this,0)">Other</button>
+                    </div>
+                    <form id="donation-form" onsubmit="demoDonate(event)">
+                        <div class="donate-custom form-group" id="custom-amount-row" style="display:none;">
+                            <label for="donate-custom-input">Custom Amount</label>
+                            <span class="donate-custom-symbol">$</span>
+                            <input type="number" id="donate-custom-input" name="amount" value="50" min="1" step="1" placeholder="50">
+                        </div>
+                        <div class="form-group" style="margin-top:12px;">
+                            <label for="donor-name">Your Name <span style="color:#c0392b">*</span></label>
+                            <input type="text" id="donor-name" name="donor_name" placeholder="e.g. Aunt Linda" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="donor-email">Email (for receipt)</label>
+                            <input type="email" id="donor-email" name="donor_email" placeholder="you@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="donor-message">Message for Maple</label>
+                            <textarea id="donor-message" name="message" rows="3" placeholder="Share some words of encouragement…"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-gold" style="width:100%;margin-top:8px;">Pledge Donation 💚</button>
+                        <div class="donate-secure-note">🔒 Your information is kept private and secure</div>
+                    </form>
+                </div>
+                <div class="donate-confirm" id="donate-confirm">
+                    <div class="donate-confirm-icon">🌿</div>
+                    <h3>Thank You!</h3>
+                    <p id="donate-confirm-msg">Your pledge has been recorded. We'll be in touch!</p>
+                    <button class="btn btn-outline" style="margin-top:20px;" onclick="mgResetDonation()">Make Another Pledge</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── FOOTER ──────────────────────────────────── -->
+<footer class="site-footer">
+    <div class="container">
+        <div class="footer-logo">🌿 Maple Gallo</div>
+        <div class="footer-tagline">Class of 2026 · EMT Graduate · Farm Party Extraordinaire</div>
+        <nav aria-label="Footer">
+            <ul style="list-style:none;display:flex;justify-content:center;gap:24px;flex-wrap:wrap;margin-bottom:16px;">
+                <li><a href="#home" style="color:var(--eucalyptus-lt);">Home</a></li>
+                <li><a href="#gallery" style="color:var(--eucalyptus-lt);">Gallery</a></li>
+                <li><a href="#upload" style="color:var(--eucalyptus-lt);">Upload Photo</a></li>
+                <li><a href="#quiz" style="color:var(--eucalyptus-lt);">Trivia</a></li>
+                <li><a href="#leaderboard" style="color:var(--eucalyptus-lt);">Leaderboard</a></li>
+                <li><a href="#donate" style="color:var(--gold-lt);">Donate 💚</a></li>
+            </ul>
+        </nav>
+        <div class="footer-divider"></div>
+        <div class="footer-copy">Made with 🌿 &amp; ❤️ for Maple Gallo — 2026</div>
+    </div>
+</footer>
+
+<div class="toast-container" id="toast-container"></div>
+
+<!-- Inline mapleGallo config for standalone preview -->
+<script>
+const mapleGallo = {
+    ajaxUrl:   '#',
+    nonce:     'preview',
+    partyDate: '2026-06-15T18:00:00',
+};
+</script>
+<script src="wp-content/themes/maple-gallo/js/main.js"></script>
+<script>
+/* Preview-mode overrides — simulate server responses in localStorage */
+const DEMO_LEADERBOARD_KEY = 'mg_leaderboard';
+
+// Override mgPost for demo mode
+window.mgPost = function(action, data) {
+    return new Promise(resolve => {
+        setTimeout(() => {
+            if (action === 'mg_submit_score') {
+                const lb = JSON.parse(localStorage.getItem(DEMO_LEADERBOARD_KEY) || '[]');
+                lb.push({
+                    name:    data.name,
+                    score:   parseInt(data.score),
+                    total:   parseInt(data.total),
+                    pct:     Math.round((data.score / data.total) * 100),
+                    seconds: parseInt(data.seconds),
+                    date:    new Date().toLocaleDateString('en-US', {month:'short', day:'numeric'}),
+                });
+                lb.sort((a,b) => b.pct - a.pct || a.seconds - b.seconds);
+                localStorage.setItem(DEMO_LEADERBOARD_KEY, JSON.stringify(lb));
+                resolve({ success: true, data: { message: 'Score saved!' } });
+            } else if (action === 'mg_get_leaderboard') {
+                const lb = JSON.parse(localStorage.getItem(DEMO_LEADERBOARD_KEY) || '[]');
+                resolve({ success: true, data: { scores: lb } });
+            } else if (action === 'mg_get_photos') {
+                resolve({ success: true, data: { photos: [] } });
+            } else {
+                resolve({ success: true, data: { message: 'Demo mode: action simulated.' } });
+            }
+        }, 200);
+    });
+};
+
+function demoUpload() {
+    const name = document.getElementById('uploader-name').value.trim();
+    const file = document.getElementById('photo-file').files[0];
+    const msg  = document.getElementById('upload-message');
+    if (!name) { msg.textContent = 'Please enter your name.'; msg.className = 'upload-message error'; return; }
+    if (!file) { msg.textContent = 'Please choose a photo.'; msg.className = 'upload-message error'; return; }
+
+    const bar = document.getElementById('upload-progress-bar');
+    const prog = document.getElementById('upload-progress');
+    prog.style.display = 'block';
+    bar.style.width = '0%';
+    setTimeout(() => bar.style.width = '60%', 100);
+    setTimeout(() => bar.style.width = '100%', 500);
+    setTimeout(() => {
+        msg.textContent = 'Photo submitted for review! It will appear in the gallery after approval. 🎉';
+        msg.className   = 'upload-message success';
+        mgToast('Photo uploaded! Pending review. 📸', 'success');
+        prog.style.display = 'none';
+    }, 800);
+}
+
+function demoDonate(e) {
+    e.preventDefault();
+    const name   = document.getElementById('donor-name').value.trim();
+    const amount = document.getElementById('donate-custom-input').value || 50;
+    if (!name) return;
+    document.getElementById('donate-form-wrap').style.display = 'none';
+    const confirm = document.getElementById('donate-confirm');
+    confirm.classList.add('show');
+    document.getElementById('donate-confirm-msg').textContent =
+        `Thank you, ${name}! Your pledge of $${amount} has been recorded. We'll be in touch!`;
+    mgToast('Thank you for your pledge! 💚', 'success');
+}
+</script>
+</body>
+</html>

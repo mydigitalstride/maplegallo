@@ -385,14 +385,14 @@ const mapleGallo = {
     nonce:     'preview',
     partyDate: '2026-06-15T18:00:00',
     questions: [
-        { q: 'What certification is Maple earning alongside their high school diploma?', opts: ['EMT / Emergency Medical Technician','Nurse Aide','Firefighter I','Phlebotomist'], correct: 0, fact: 'Maple is earning their EMT certification at the same time as graduating high school — an incredible double achievement!' },
-        { q: "What is Maple's favorite season?", opts: ['Summer','Autumn','Spring','Winter'], correct: 1, fact: 'Maple loves the golden colors and crisp air of autumn — fitting for a farm party!' },
-        { q: 'If Maple could travel anywhere in the world, where would they go?', opts: ['Iceland','Italy','Japan','New Zealand'], correct: 2, fact: "Japan has always been at the top of Maple's travel bucket list!" },
-        { q: "What is Maple's go-to comfort food?", opts: ['Tacos','Mac and Cheese','Pizza','Ramen'], correct: 3, fact: "Maple never says no to a big bowl of ramen on a cold evening!" },
-        { q: "Which best describes Maple's personality?", opts: ['Calm & Introspective','Bold & Adventurous','Warm & Empathetic','Witty & Sarcastic'], correct: 2, fact: "Maple's warmth and empathy are exactly what makes them such a perfect fit for a career in emergency medicine." },
-        { q: "What is Maple's hidden talent?", opts: ['Playing the guitar','Speed reading','Baking sourdough bread','Painting watercolors'], correct: 2, fact: "Maple can bake an amazing loaf of sourdough — they started during the pandemic and never stopped!" },
-        { q: "What's Maple's favorite way to decompress?", opts: ['Hiking outdoors','Watching movies','Reading a good book','Listening to podcasts'], correct: 0, fact: "Maple loves getting out in nature — trail walks clear their head like nothing else." },
-        { q: 'Which quote best resonates with Maple?', opts: ['"Be the change you wish to see in the world."','"In the middle of difficulty lies opportunity."','"The purpose of life is to contribute in some way to making things better."','"You miss 100% of the shots you don\'t take."'], correct: 2, fact: 'Maple lives by this mindset — driven by purpose and a desire to make life better for those around them.' },
+        { type:'multiple', points:1, q: 'What certification is Maple earning alongside their high school diploma?', opts: ['EMT / Emergency Medical Technician','Nurse Aide','Firefighter I','Phlebotomist'], correct: 0, fact: 'Maple is earning their EMT certification at the same time as graduating high school — an incredible double achievement!' },
+        { type:'multiple', points:1, q: "What is Maple's favorite season?", opts: ['Summer','Autumn','Spring','Winter'], correct: 1, fact: 'Maple loves the golden colors and crisp air of autumn — fitting for a farm party!' },
+        { type:'yesno',    points:2, q: 'Has Maple ever been outside the United States?', opts: ['Yes','No'], correct: 1, fact: "Maple dreams of traveling abroad — Japan is at the top of their bucket list!" },
+        { type:'multiple', points:1, q: "What is Maple's go-to comfort food?", opts: ['Tacos','Mac and Cheese','Pizza','Ramen'], correct: 3, fact: "Maple never says no to a big bowl of ramen on a cold evening!" },
+        { type:'multiple', points:1, q: "Which best describes Maple's personality?", opts: ['Calm & Introspective','Bold & Adventurous','Warm & Empathetic','Witty & Sarcastic'], correct: 2, fact: "Maple's warmth and empathy are exactly what makes them such a perfect fit for a career in emergency medicine." },
+        { type:'fill',     points:3, q: "What baked good is Maple known for making from scratch?", opts: ['sourdough|sourdough bread'], correct: 0, fact: "Maple can bake an amazing loaf of sourdough — they started during the pandemic and never stopped!" },
+        { type:'yesno',    points:2, q: "Does Maple prefer the outdoors over staying in?", opts: ['Yes','No'], correct: 0, fact: "Maple loves getting out in nature — trail walks clear their head like nothing else." },
+        { type:'multiple', points:1, q: 'Which quote best resonates with Maple?', opts: ['"Be the change you wish to see in the world."','"In the middle of difficulty lies opportunity."','"The purpose of life is to contribute in some way to making things better."','"You miss 100% of the shots you don\'t take."'], correct: 2, fact: 'Maple lives by this mindset — driven by purpose and a desire to make life better for those around them.' },
     ],
 };
 </script>
@@ -407,7 +407,8 @@ window.mgPost = function(action, data) {
         setTimeout(() => {
             if (action === 'mg_submit_score') {
                 const lb = JSON.parse(localStorage.getItem(DEMO_LB_KEY) || '[]');
-                lb.push({ name: data.name, score: +data.score, total: +data.total, pct: Math.round((data.score/data.total)*100), seconds: +data.seconds, date: new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'}) });
+                const mp = +data.maxPoints || +data.total;
+                lb.push({ name: data.name, score: +data.score, total: +data.total, maxPoints: mp, pct: Math.round((data.score/mp)*100), seconds: +data.seconds, date: new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'}) });
                 lb.sort((a,b) => b.pct - a.pct || a.seconds - b.seconds);
                 localStorage.setItem(DEMO_LB_KEY, JSON.stringify(lb));
                 resolve({ success: true, data: { message: 'Score saved!' } });

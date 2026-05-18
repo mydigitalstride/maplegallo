@@ -316,6 +316,7 @@ let quizState = {
     playerName:   '',
     currentQ:     0,
     score:        0,
+    maxPoints:    0,
     answered:     false,
     startTime:    0,
     elapsedSecs:  0,
@@ -329,31 +330,51 @@ function mgStartQuiz() {
         mgToast('Please enter your name to play! 🌿', 'default');
         return;
     }
-    quizState = { playerName: name, currentQ: 0, score: 0, answered: false, startTime: Date.now(), elapsedSecs: 0 };
+    const maxPoints = QUIZ_QUESTIONS.reduce((sum, q) => sum + (parseInt(q.points) || 1), 0);
+    quizState = { playerName: name, currentQ: 0, score: 0, maxPoints, answered: false, startTime: Date.now(), elapsedSecs: 0 };
     document.getElementById('quiz-start').style.display = 'none';
     document.getElementById('quiz-game').style.display  = 'block';
     mgRenderQuestion();
 }
 
 function mgRenderQuestion() {
-    const { currentQ, score } = quizState;
+    const { currentQ, score, maxPoints } = quizState;
     const total = QUIZ_QUESTIONS.length;
     const q = QUIZ_QUESTIONS[currentQ];
+    const type = q.type || 'multiple';
+    const pts = parseInt(q.points) || 1;
 
     document.getElementById('quiz-q-number').textContent = `Question ${currentQ + 1} of ${total}`;
     document.getElementById('quiz-q-text').textContent   = q.q;
     document.getElementById('quiz-progress-text').textContent = `Question ${currentQ + 1} of ${total}`;
     document.getElementById('quiz-progress-fill').style.width = `${(currentQ / total) * 100}%`;
-    document.getElementById('quiz-score-display').textContent = `Score: ${score}`;
+    document.getElementById('quiz-score-display').textContent = `Score: ${score} / ${maxPoints} pts`;
 
     const optWrap = document.getElementById('quiz-options');
     const letters = ['A','B','C','D'];
-    optWrap.innerHTML = q.opts.map((opt, i) => `
-        <button class="quiz-option" onclick="mgSelectAnswer(${i})" data-index="${i}">
-            <span class="quiz-option-letter">${letters[i]}</span>
-            <span>${opt}</span>
-        </button>
-    `).join('');
+
+    const ptsBadge = pts > 1 ? `<span class="quiz-pts-badge">${pts} pts</span>` : '';
+
+    if (type === 'fill') {
+        optWrap.innerHTML = `
+            <div class="quiz-fill-wrap">
+                ${ptsBadge}
+                <input type="text" id="quiz-fill-input" class="quiz-fill-input" placeholder="Type your answer…" autocomplete="off">
+                <button class="btn btn-gold quiz-fill-submit" onclick="mgSubmitFill()">Submit</button>
+            </div>`;
+        const inp = document.getElementById('quiz-fill-input');
+        inp.addEventListener('keydown', e => { if (e.key === 'Enter') mgSubmitFill(); });
+        setTimeout(() => inp.focus(), 50);
+    } else {
+        const opts = type === 'yesno' ? ['Yes','No'] : q.opts;
+        optWrap.innerHTML = (ptsBadge ? `<div class="quiz-pts-row">${ptsBadge}</div>` : '') +
+            opts.map((opt, i) => `
+            <button class="quiz-option" onclick="mgSelectAnswer(${i})" data-index="${i}">
+                <span class="quiz-option-letter">${type === 'yesno' ? (i === 0 ? 'Y' : 'N') : letters[i]}</span>
+                <span>${opt}</span>
+            </button>
+        `).join('');
+    }
 
     const fb = document.getElementById('quiz-feedback');
     fb.className = 'quiz-feedback';
@@ -368,24 +389,57 @@ function mgSelectAnswer(selectedIndex) {
     quizState.answered = true;
 
     const q = QUIZ_QUESTIONS[quizState.currentQ];
+    const pts = parseInt(q.points) || 1;
     const correct = q.correct === selectedIndex;
 
-    if (correct) quizState.score++;
+    if (correct) quizState.score += pts;
 
     const opts = document.querySelectorAll('.quiz-option');
     opts.forEach((btn, i) => {
         btn.disabled = true;
-        if (i === q.correct)    btn.classList.add('correct');
+        if (i === q.correct)                 btn.classList.add('correct');
         if (i === selectedIndex && !correct) btn.classList.add('wrong');
     });
+
+    const correctLabel = (q.type === 'yesno') ? (q.correct === 0 ? 'Yes' : 'No') : q.opts[q.correct];
+    const fb = document.getElementById('quiz-feedback');
+    fb.className = `quiz-feedback show ${correct ? 'correct-fb' : 'wrong-fb'}`;
+    fb.innerHTML = correct
+        ? `<strong>Correct! +${pts} pt${pts > 1 ? 's' : ''}</strong> ${q.fact}`
+        : `<strong>Not quite!</strong> The correct answer is <em>${correctLabel}</em>. ${q.fact}`;
+
+    document.getElementById('quiz-score-display').textContent = `Score: ${quizState.score} / ${quizState.maxPoints} pts`;
+    document.getElementById('quiz-next-btn').style.display = 'inline-block';
+    document.getElementById('quiz-next-btn').textContent =
+        quizState.currentQ + 1 < QUIZ_QUESTIONS.length ? 'Next Question →' : 'See Results!';
+}
+
+function mgSubmitFill() {
+    if (quizState.answered) return;
+
+    const inp = document.getElementById('quiz-fill-input');
+    if (!inp) return;
+    const val = inp.value.trim().toLowerCase();
+    if (!val) { inp.focus(); return; }
+
+    quizState.answered = true;
+    inp.disabled = true;
+    document.querySelector('.quiz-fill-submit').disabled = true;
+
+    const q = QUIZ_QUESTIONS[quizState.currentQ];
+    const pts = parseInt(q.points) || 1;
+    const accepted = (q.opts[0] || '').split('|').map(s => s.trim().toLowerCase()).filter(Boolean);
+    const correct = accepted.some(a => val === a);
+
+    if (correct) quizState.score += pts;
 
     const fb = document.getElementById('quiz-feedback');
     fb.className = `quiz-feedback show ${correct ? 'correct-fb' : 'wrong-fb'}`;
     fb.innerHTML = correct
-        ? `<strong>Correct! 🎉</strong> ${q.fact}`
-        : `<strong>Not quite!</strong> The correct answer is <em>${q.opts[q.correct]}</em>. ${q.fact}`;
+        ? `<strong>Correct! +${pts} pt${pts > 1 ? 's' : ''}</strong> ${q.fact}`
+        : `<strong>Not quite!</strong> The answer is <em>${q.opts[0]}</em>. ${q.fact}`;
 
-    document.getElementById('quiz-score-display').textContent = `Score: ${quizState.score}`;
+    document.getElementById('quiz-score-display').textContent = `Score: ${quizState.score} / ${quizState.maxPoints} pts`;
     document.getElementById('quiz-next-btn').style.display = 'inline-block';
     document.getElementById('quiz-next-btn').textContent =
         quizState.currentQ + 1 < QUIZ_QUESTIONS.length ? 'Next Question →' : 'See Results!';
@@ -402,32 +456,33 @@ function mgNextQuestion() {
 
 function mgShowResults() {
     quizState.elapsedSecs = Math.floor((Date.now() - quizState.startTime) / 1000);
-    const { score, playerName, elapsedSecs } = quizState;
+    const { score, maxPoints, playerName, elapsedSecs } = quizState;
     const total = QUIZ_QUESTIONS.length;
-    const pct = Math.round((score / total) * 100);
+    const pct = maxPoints > 0 ? Math.round((score / maxPoints) * 100) : 0;
 
     document.getElementById('quiz-game').style.display    = 'none';
     document.getElementById('quiz-results').style.display = 'block';
     document.getElementById('result-score').textContent = score;
-    document.getElementById('result-label').textContent = `/ ${total}`;
+    document.getElementById('result-label').textContent = `/ ${maxPoints} pts`;
 
     const msgs = [
-        { min:100, msg:"Perfect Score! 🏆", sub:"You know Maple better than anyone!" },
-        { min:75,  msg:"Maple Expert! 🌿",  sub:"You've been paying close attention!" },
-        { min:50,  msg:"Pretty Good! 🎉",   sub:"You know Maple pretty well — well done!" },
-        { min:25,  msg:"Good Try! 😊",      sub:"Maybe spend more time with Maple and play again!" },
-        { min:0,   msg:"Thanks for Playing!",sub:"Now you know Maple a little better! 🌿" },
+        { min:100, msg:"Perfect Score!",      sub:"You know Maple better than anyone!" },
+        { min:75,  msg:"Maple Expert!",        sub:"You've been paying close attention!" },
+        { min:50,  msg:"Pretty Good!",         sub:"You know Maple pretty well — well done!" },
+        { min:25,  msg:"Good Try!",            sub:"Maybe spend more time with Maple and play again!" },
+        { min:0,   msg:"Thanks for Playing!",  sub:"Now you know Maple a little better!" },
     ];
     const result = msgs.find(m => pct >= m.min);
     document.getElementById('result-msg').textContent = result.msg;
-    document.getElementById('result-sub').textContent = `${playerName}, you scored ${score} out of ${total} (${pct}%) in ${elapsedSecs}s. ${result.sub}`;
+    document.getElementById('result-sub').textContent = `${playerName}, you scored ${score} out of ${maxPoints} points (${pct}%) in ${elapsedSecs}s. ${result.sub}`;
 
     // Submit to leaderboard
     mgPost('mg_submit_score', {
-        name:    playerName,
-        score:   score,
-        total:   total,
-        seconds: elapsedSecs,
+        name:      playerName,
+        score:     score,
+        total:     total,
+        maxPoints: maxPoints,
+        seconds:   elapsedSecs,
     }).then(() => mgLoadLeaderboard()).catch(() => {});
 
     // Animate progress fill to final state
@@ -447,7 +502,7 @@ function mgLoadLeaderboard() {
 
     mgPost('mg_get_leaderboard', {}).then(res => {
         if (!res.success || !res.data.scores.length) {
-            body.innerHTML = '<div class="leaderboard-empty"><p>No scores yet — be the first to play! 🏆</p></div>';
+            body.innerHTML = '<div class="leaderboard-empty"><p>No scores yet — be the first to play!</p></div>';
             return;
         }
         const medals = ['🥇','🥈','🥉'];
@@ -455,7 +510,7 @@ function mgLoadLeaderboard() {
             <div class="leaderboard-row ${i < 3 ? 'top-'+(i+1) : ''}">
                 <span class="lb-rank">${i < 3 ? `<span class="lb-medal">${medals[i]}</span>` : i + 1}</span>
                 <span class="lb-name">${s.name}</span>
-                <span class="lb-score">${s.score}/${s.total}</span>
+                <span class="lb-score">${s.score}/${s.maxPoints || s.total} pts</span>
                 <span class="lb-time">${s.date}</span>
             </div>
         `).join('');

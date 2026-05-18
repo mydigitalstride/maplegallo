@@ -814,6 +814,36 @@ h1,h2,h3,h4,h5,h6 {
 .quiz-feedback.correct-fb { background: rgba(122,158,135,0.15); border: 1px solid var(--eucalyptus); color: var(--eucalyptus-lt); }
 .quiz-feedback.wrong-fb   { background: rgba(231,76,60,0.1);    border: 1px solid #e74c3c;          color: #f5a9a0; }
 
+/* Fill-in-the-blank */
+.quiz-fill-wrap { display: flex; flex-direction: column; gap: 12px; align-items: center; }
+.quiz-fill-input {
+  width: 100%;
+  max-width: 400px;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.08);
+  border: 2px solid var(--eucalyptus);
+  border-radius: 8px;
+  color: var(--white);
+  font-size: 1rem;
+  text-align: center;
+}
+.quiz-fill-input:focus { outline: none; border-color: var(--gold); }
+.quiz-fill-submit { margin-top: 4px; }
+
+/* Points badge */
+.quiz-pts-badge {
+  display: inline-block;
+  background: var(--gold);
+  color: var(--dark-wood);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+  letter-spacing: 0.03em;
+  margin-bottom: 8px;
+}
+.quiz-pts-row { text-align: right; margin-bottom: 4px; }
+
 .quiz-nav {
   display: flex;
   justify-content: space-between;

@@ -178,25 +178,27 @@ add_action('wp_ajax_mg_submit_score',        'mg_submit_score');
 function mg_submit_score() {
     check_ajax_referer('maple_gallo_nonce', 'nonce');
 
-    $name    = sanitize_text_field($_POST['name'] ?? '');
-    $score   = intval($_POST['score'] ?? 0);
-    $total   = intval($_POST['total'] ?? 0);
-    $seconds = intval($_POST['seconds'] ?? 999);
+    $name      = sanitize_text_field($_POST['name'] ?? '');
+    $score     = intval($_POST['score'] ?? 0);
+    $total     = intval($_POST['total'] ?? 0);
+    $maxPoints = intval($_POST['maxPoints'] ?? $total);
+    $seconds   = intval($_POST['seconds'] ?? 999);
 
-    if (empty($name) || $total < 1) {
+    if (empty($name) || $maxPoints < 1) {
         wp_send_json_error(['message' => 'Invalid submission.']);
     }
-    $score = max(0, min($score, $total));
+    $score = max(0, min($score, $maxPoints));
 
     wp_insert_post([
         'post_type'   => 'mg_score',
         'post_title'  => $name,
         'post_status' => 'publish',
         'meta_input'  => [
-            '_mg_score'   => $score,
-            '_mg_total'   => $total,
-            '_mg_seconds' => $seconds,
-            '_mg_pct'     => round(($score / $total) * 100),
+            '_mg_score'     => $score,
+            '_mg_total'     => $total,
+            '_mg_maxpoints' => $maxPoints,
+            '_mg_seconds'   => $seconds,
+            '_mg_pct'       => round(($score / $maxPoints) * 100),
         ],
     ]);
     wp_send_json_success(['message' => 'Score saved!']);
@@ -220,14 +222,17 @@ function mg_get_leaderboard() {
 
     $data = [];
     foreach ($scores as $i => $entry) {
+        $maxPts = (int) get_post_meta($entry->ID, '_mg_maxpoints', true);
+        $total  = (int) get_post_meta($entry->ID, '_mg_total', true);
         $data[] = [
-            'rank'    => $i + 1,
-            'name'    => $entry->post_title,
-            'score'   => (int) get_post_meta($entry->ID, '_mg_score', true),
-            'total'   => (int) get_post_meta($entry->ID, '_mg_total', true),
-            'pct'     => (int) get_post_meta($entry->ID, '_mg_pct', true),
-            'seconds' => (int) get_post_meta($entry->ID, '_mg_seconds', true),
-            'date'    => get_the_date('M j', $entry),
+            'rank'      => $i + 1,
+            'name'      => $entry->post_title,
+            'score'     => (int) get_post_meta($entry->ID, '_mg_score', true),
+            'total'     => $total,
+            'maxPoints' => $maxPts ?: $total,
+            'pct'       => (int) get_post_meta($entry->ID, '_mg_pct', true),
+            'seconds'   => (int) get_post_meta($entry->ID, '_mg_seconds', true),
+            'date'      => get_the_date('M j', $entry),
         ];
     }
     wp_send_json_success(['scores' => $data]);
@@ -316,48 +321,64 @@ function mg_get_quiz_questions(): array {
 function mg_default_quiz_questions(): array {
     return [
         [
+            'type'    => 'multiple',
+            'points'  => 1,
             'q'       => 'What certification is Maple earning alongside their high school diploma?',
             'opts'    => ['EMT / Emergency Medical Technician','Nurse Aide','Firefighter I','Phlebotomist'],
             'correct' => 0,
             'fact'    => 'Maple is earning their EMT certification at the same time as graduating high school — an incredible double achievement!',
         ],
         [
+            'type'    => 'multiple',
+            'points'  => 1,
             'q'       => "What is Maple's favorite season?",
             'opts'    => ['Summer','Autumn','Spring','Winter'],
             'correct' => 1,
             'fact'    => 'Maple loves the golden colors and crisp air of autumn — fitting for a farm party!',
         ],
         [
-            'q'       => 'If Maple could travel anywhere in the world, where would they go?',
-            'opts'    => ['Iceland','Italy','Japan','New Zealand'],
-            'correct' => 2,
-            'fact'    => "Japan has always been at the top of Maple's travel bucket list!",
+            'type'    => 'yesno',
+            'points'  => 2,
+            'q'       => 'Has Maple ever been outside the United States?',
+            'opts'    => ['Yes','No'],
+            'correct' => 1,
+            'fact'    => "Maple dreams of traveling abroad — Japan is at the top of their bucket list!",
         ],
         [
+            'type'    => 'multiple',
+            'points'  => 1,
             'q'       => "What is Maple's go-to comfort food?",
             'opts'    => ['Tacos','Mac and Cheese','Pizza','Ramen'],
             'correct' => 3,
             'fact'    => "Maple never says no to a big bowl of ramen on a cold evening!",
         ],
         [
+            'type'    => 'multiple',
+            'points'  => 1,
             'q'       => "Which best describes Maple's personality?",
             'opts'    => ['Calm & Introspective','Bold & Adventurous','Warm & Empathetic','Witty & Sarcastic'],
             'correct' => 2,
             'fact'    => "Maple's warmth and empathy are exactly what makes them such a perfect fit for a career in emergency medicine.",
         ],
         [
-            'q'       => "What is Maple's hidden talent?",
-            'opts'    => ['Playing the guitar','Speed reading','Baking sourdough bread','Painting watercolors'],
-            'correct' => 2,
+            'type'    => 'fill',
+            'points'  => 3,
+            'q'       => "What baked good is Maple known for making from scratch?",
+            'opts'    => ['sourdough'],
+            'correct' => 0,
             'fact'    => 'Maple can bake an amazing loaf of sourdough — they started during the pandemic and never stopped!',
         ],
         [
-            'q'       => "What's Maple's favorite way to decompress?",
-            'opts'    => ['Hiking outdoors','Watching movies','Reading a good book','Listening to podcasts'],
+            'type'    => 'yesno',
+            'points'  => 2,
+            'q'       => "Does Maple prefer the outdoors over staying in?",
+            'opts'    => ['Yes','No'],
             'correct' => 0,
             'fact'    => "Maple loves getting out in nature — trail walks clear their head like nothing else.",
         ],
         [
+            'type'    => 'multiple',
+            'points'  => 1,
             'q'       => 'Which quote best resonates with Maple?',
             'opts'    => [
                 '"Be the change you wish to see in the world."',
@@ -459,8 +480,11 @@ function mg_quiz_admin_page() {
         $raw = $_POST['questions'] ?? [];
         $clean = [];
         foreach ($raw as $q) {
+            $type = in_array($q['type'] ?? '', ['multiple','yesno','fill']) ? $q['type'] : 'multiple';
             $opts = array_map('sanitize_text_field', (array) ($q['opts'] ?? []));
             $clean[] = [
+                'type'    => $type,
+                'points'  => max(1, intval($q['points'] ?? 1)),
                 'q'       => sanitize_text_field($q['q'] ?? ''),
                 'opts'    => array_values($opts),
                 'correct' => intval($q['correct'] ?? 0),
@@ -498,7 +522,7 @@ function mg_quiz_admin_page() {
 
     <!-- Template for new question rows -->
     <template id="question-template">
-        <?php mg_render_question_row('__INDEX__', ['q'=>'','opts'=>['','','',''],'correct'=>0,'fact'=>'']); ?>
+        <?php mg_render_question_row('__INDEX__', ['type'=>'multiple','points'=>1,'q'=>'','opts'=>['','','',''],'correct'=>0,'fact'=>'']); ?>
     </template>
 
     <style>
@@ -510,6 +534,8 @@ function mg_quiz_admin_page() {
         .q-grid input, .q-grid textarea, .q-grid select { width:100%; }
         .correct-row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-top:4px; }
         .correct-row label { font-weight:normal; display:flex; align-items:center; gap:4px; cursor:pointer; }
+        .q-type-meta { display:grid; grid-template-columns:1fr auto; gap:12px; }
+        .fill-answer-wrap input { width:100%; }
     </style>
     <script>
     let qCount = <?php echo count($questions); ?>;
@@ -529,6 +555,20 @@ function mg_quiz_admin_page() {
             renumberRows();
         }
     });
+    document.getElementById('questions-list').addEventListener('change', e => {
+        if (e.target.classList.contains('q-type-select')) {
+            updateQuestionType(e.target);
+        }
+    });
+    function updateQuestionType(sel) {
+        const row = sel.closest('.question-row');
+        const type = sel.value;
+        row.querySelector('.opts-multiple').style.display  = type === 'multiple' ? '' : 'none';
+        row.querySelector('.opts-yesno').style.display     = type === 'yesno'    ? '' : 'none';
+        row.querySelector('.opts-fill').style.display      = type === 'fill'     ? '' : 'none';
+    }
+    // Init all existing rows on page load
+    document.querySelectorAll('.q-type-select').forEach(updateQuestionType);
     function renumberRows() {
         document.querySelectorAll('.question-row').forEach((row, i) => {
             row.querySelector('.q-number').textContent = `Question ${i + 1}`;
@@ -541,6 +581,12 @@ function mg_quiz_admin_page() {
 function mg_render_question_row(int|string $i, array $q): void {
     $letters = ['A','B','C','D'];
     $correct = (int) ($q['correct'] ?? 0);
+    $type    = in_array($q['type'] ?? '', ['multiple','yesno','fill']) ? $q['type'] : 'multiple';
+    $points  = max(1, (int) ($q['points'] ?? 1));
+
+    $show_multiple = $type === 'multiple' ? '' : 'display:none;';
+    $show_yesno    = $type === 'yesno'    ? '' : 'display:none;';
+    $show_fill     = $type === 'fill'     ? '' : 'display:none;';
     ?>
     <div class="question-row">
         <h3>
@@ -554,27 +600,81 @@ function mg_render_question_row(int|string $i, array $q): void {
                        value="<?php echo esc_attr($q['q'] ?? ''); ?>"
                        placeholder="e.g. What is Maple's favorite season?" required>
             </div>
-            <?php foreach ([0,1,2,3] as $oi): ?>
+
+            <!-- Type + Points row -->
             <div>
-                <label>Option <?php echo $letters[$oi]; ?></label>
-                <input type="text" name="questions[<?php echo $i; ?>][opts][<?php echo $oi; ?>]"
-                       value="<?php echo esc_attr($q['opts'][$oi] ?? ''); ?>"
-                       placeholder="Option <?php echo $letters[$oi]; ?>">
+                <label>Question Type</label>
+                <select name="questions[<?php echo $i; ?>][type]" class="q-type-select">
+                    <option value="multiple" <?php selected($type, 'multiple'); ?>>Multiple Choice (4 options)</option>
+                    <option value="yesno"    <?php selected($type, 'yesno'); ?>>Yes / No</option>
+                    <option value="fill"     <?php selected($type, 'fill'); ?>>Fill in the Blank</option>
+                </select>
             </div>
-            <?php endforeach; ?>
-            <div class="q-full">
-                <label>Correct Answer</label>
-                <div class="correct-row">
+            <div>
+                <label>Points</label>
+                <input type="number" name="questions[<?php echo $i; ?>][points]"
+                       value="<?php echo $points; ?>" min="1" max="100" style="width:100px;">
+            </div>
+
+            <!-- Multiple choice options -->
+            <div class="q-full opts-multiple" style="<?php echo $show_multiple; ?>">
+                <label>Answer Options</label>
+                <div class="q-grid" style="margin-top:8px;">
+                    <?php foreach ([0,1,2,3] as $oi): ?>
+                    <div>
+                        <label><?php echo $letters[$oi]; ?></label>
+                        <input type="text" name="questions[<?php echo $i; ?>][opts][<?php echo $oi; ?>]"
+                               value="<?php echo esc_attr($q['opts'][$oi] ?? ''); ?>"
+                               placeholder="Option <?php echo $letters[$oi]; ?>">
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+                <div class="correct-row" style="margin-top:12px;">
+                    <strong style="font-size:13px;">Correct Answer:</strong>
                     <?php foreach ([0,1,2,3] as $oi): ?>
                     <label>
                         <input type="radio" name="questions[<?php echo $i; ?>][correct]"
                                value="<?php echo $oi; ?>"
-                               <?php checked($correct, $oi); ?>>
+                               <?php if ($type === 'multiple') checked($correct, $oi); ?>>
                         <?php echo $letters[$oi]; ?>
                     </label>
                     <?php endforeach; ?>
                 </div>
             </div>
+
+            <!-- Yes / No options -->
+            <div class="q-full opts-yesno" style="<?php echo $show_yesno; ?>">
+                <label>Correct Answer</label>
+                <div class="correct-row" style="margin-top:8px;">
+                    <label>
+                        <input type="radio" name="questions[<?php echo $i; ?>][correct]"
+                               value="0"
+                               <?php if ($type === 'yesno') checked($correct, 0); ?>>
+                        Yes
+                    </label>
+                    <label>
+                        <input type="radio" name="questions[<?php echo $i; ?>][correct]"
+                               value="1"
+                               <?php if ($type === 'yesno') checked($correct, 1); ?>>
+                        No
+                    </label>
+                    <!-- Hidden opts so they post correctly -->
+                    <input type="hidden" name="questions[<?php echo $i; ?>][opts][0]" value="Yes">
+                    <input type="hidden" name="questions[<?php echo $i; ?>][opts][1]" value="No">
+                </div>
+            </div>
+
+            <!-- Fill in the blank -->
+            <div class="q-full opts-fill" style="<?php echo $show_fill; ?>">
+                <label>Accepted Answer <small>(case-insensitive; separate alternatives with |)</small></label>
+                <div class="fill-answer-wrap" style="margin-top:6px;">
+                    <input type="text" name="questions[<?php echo $i; ?>][opts][0]"
+                           value="<?php echo esc_attr($q['opts'][0] ?? ''); ?>"
+                           placeholder="e.g. sourdough | sourdough bread">
+                    <input type="hidden" name="questions[<?php echo $i; ?>][correct]" value="0">
+                </div>
+            </div>
+
             <div class="q-full">
                 <label>Fun Fact (shown after answer)</label>
                 <textarea name="questions[<?php echo $i; ?>][fact]"

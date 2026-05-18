@@ -110,41 +110,10 @@ $quiz_count = count(mg_get_quiz_questions());
             <span class="section-label">Memories</span>
             <h2 class="section-title">Photo Gallery</h2>
             <p class="section-subtitle">Capture a moment tonight or send your favorite photos of Maple.</p>
-        </div>
-
-        <div class="gallery-filters" id="gallery-filters">
-            <button class="gallery-filter active" data-cat="all">All Photos</button>
-            <button class="gallery-filter" data-cat="childhood">Childhood</button>
-            <button class="gallery-filter" data-cat="school">School Life</button>
-            <button class="gallery-filter" data-cat="emt">EMT Training</button>
-            <button class="gallery-filter" data-cat="friends">Friends &amp; Family</button>
-            <button class="gallery-filter" data-cat="party">Party Uploads</button>
+            <p style="margin-top:8px;"><a href="#upload" class="btn btn-outline" style="font-size:0.9rem;padding:8px 20px;">Leave a Memory &darr;</a></p>
         </div>
 
         <div class="gallery-grid" id="gallery-grid">
-            <?php
-            $seed = [
-                ['label'=>'Childhood',    'cat'=>'childhood', 'color'=>'b2cdb9'],
-                ['label'=>'School Days',  'cat'=>'school',    'color'=>'c9956c'],
-                ['label'=>'Study Nights', 'cat'=>'school',    'color'=>'7a9e87'],
-                ['label'=>'EMT Training', 'cat'=>'emt',       'color'=>'4e7260'],
-                ['label'=>'Best Friends', 'cat'=>'friends',   'color'=>'8b5e3c'],
-                ['label'=>'Family Fun',   'cat'=>'friends',   'color'=>'a8c4a2'],
-            ];
-            foreach ($seed as $sp):
-            ?>
-            <div class="gallery-item" data-cat="<?php echo esc_attr($sp['cat']); ?>"
-                 data-full="https://placehold.co/900x700/<?php echo $sp['color']; ?>/fff?text=<?php echo urlencode($sp['label']); ?>"
-                 data-caption="<?php echo esc_attr($sp['label']); ?>">
-                <img src="https://placehold.co/400x400/<?php echo $sp['color']; ?>/fff?text=<?php echo urlencode($sp['label']); ?>"
-                     alt="<?php echo esc_attr($sp['label']); ?>" loading="lazy">
-                <div class="gallery-overlay"><span class="gallery-overlay-text"><?php echo esc_html($sp['label']); ?></span></div>
-            </div>
-            <?php endforeach; ?>
-        </div>
-
-        <div class="text-center" style="margin-top:40px;">
-            <button class="btn btn-outline" id="load-more-photos">Load More</button>
         </div>
     </div>
 </section>

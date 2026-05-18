@@ -481,7 +481,14 @@ function mg_quiz_admin_page() {
         $clean = [];
         foreach ($raw as $q) {
             $type = in_array($q['type'] ?? '', ['multiple','yesno','twooption','fill']) ? $q['type'] : 'multiple';
-            $opts = array_map('sanitize_text_field', (array) ($q['opts'] ?? []));
+            $raw_opts = array_map('sanitize_text_field', (array) ($q['opts'] ?? []));
+            if ($type === 'yesno') {
+                $opts = ['Yes', 'No'];
+            } elseif ($type === 'twooption') {
+                $opts = array_slice(array_values($raw_opts), 0, 2);
+            } else {
+                $opts = array_values($raw_opts);
+            }
             $clean[] = [
                 'type'    => $type,
                 'points'  => max(1, intval($q['points'] ?? 1)),
@@ -570,6 +577,17 @@ function mg_quiz_admin_page() {
     }
     // Init all existing rows on page load
     document.querySelectorAll('.q-type-select').forEach(updateQuestionType);
+
+    // Before submit, disable inputs inside hidden type sections so they don't
+    // overwrite the active section's values in the POST body.
+    document.getElementById('quiz-admin-form').addEventListener('submit', () => {
+        document.querySelectorAll('.opts-multiple, .opts-yesno, .opts-twooption, .opts-fill').forEach(div => {
+            if (div.style.display === 'none') {
+                div.querySelectorAll('input, textarea, select').forEach(el => { el.disabled = true; });
+            }
+        });
+    });
+
     function renumberRows() {
         document.querySelectorAll('.question-row').forEach((row, i) => {
             row.querySelector('.q-number').textContent = `Question ${i + 1}`;
@@ -661,9 +679,6 @@ function mg_render_question_row(int|string $i, array $q): void {
                                <?php if ($type === 'yesno') checked($correct, 1); ?>>
                         No
                     </label>
-                    <!-- Hidden opts so they post correctly -->
-                    <input type="hidden" name="questions[<?php echo $i; ?>][opts][0]" value="Yes">
-                    <input type="hidden" name="questions[<?php echo $i; ?>][opts][1]" value="No">
                 </div>
             </div>
 

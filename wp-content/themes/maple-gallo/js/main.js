@@ -90,20 +90,6 @@ function mgPost(action, data) {
         allItems = Array.from(document.querySelectorAll('.gallery-item'));
     }
 
-    // Filter buttons
-    const filterBtns = document.querySelectorAll('.gallery-filter');
-    filterBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            filterBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            const cat = btn.dataset.cat;
-            allItems.forEach(item => {
-                const show = cat === 'all' || item.dataset.cat === cat;
-                item.style.display = show ? '' : 'none';
-            });
-        });
-    });
-
     // Open lightbox
     document.getElementById('gallery-grid')?.addEventListener('click', e => {
         const item = e.target.closest('.gallery-item');
@@ -114,7 +100,7 @@ function mgPost(action, data) {
     });
 
     function showLightbox(index) {
-        const visible = allItems.filter(i => i.style.display !== 'none');
+        const visible = allItems;
         if (!visible.length) return;
         index = (index + visible.length) % visible.length;
         currentLightboxIndex = index;
@@ -367,7 +353,9 @@ function mgRenderQuestion() {
         setTimeout(() => inp.focus(), 50);
     } else {
         const isTwoOpt = type === 'yesno' || type === 'twooption';
-        const opts = type === 'yesno' ? ['Yes','No'] : q.opts;
+        const opts = type === 'yesno' ? ['Yes','No']
+                   : type === 'twooption' ? q.opts.slice(0, 2)
+                   : q.opts;
         optWrap.innerHTML = (ptsBadge ? `<div class="quiz-pts-row">${ptsBadge}</div>` : '') +
             opts.map((opt, i) => `
             <button class="quiz-option" onclick="mgSelectAnswer(${i})" data-index="${i}">
@@ -402,7 +390,9 @@ function mgSelectAnswer(selectedIndex) {
         if (i === selectedIndex && !correct) btn.classList.add('wrong');
     });
 
-    const correctLabel = q.type === 'yesno' ? (q.correct === 0 ? 'Yes' : 'No') : q.opts[q.correct];
+    const correctLabel = q.type === 'yesno'
+        ? (q.correct === 0 ? 'Yes' : 'No')
+        : (q.opts[q.correct] || '');
     const fb = document.getElementById('quiz-feedback');
     fb.className = `quiz-feedback show ${correct ? 'correct-fb' : 'wrong-fb'}`;
     fb.innerHTML = correct

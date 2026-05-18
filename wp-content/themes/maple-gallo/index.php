@@ -49,7 +49,7 @@ $quiz_count = count(mg_get_quiz_questions());
 
         <div class="hero-actions">
             <a href="#gallery" class="btn btn-primary">See the Gallery</a>
-            <a href="#emt-fund" class="btn btn-outline">Support the EMT Fund</a>
+            <a href="#emt-fund" class="btn btn-outline">Leave a digital Gift</a>
         </div>
     </div>
 
@@ -109,7 +109,7 @@ $quiz_count = count(mg_get_quiz_questions());
         <div class="text-center">
             <span class="section-label">Memories</span>
             <h2 class="section-title">Photo Gallery</h2>
-            <p class="section-subtitle">A collection of Maple's best moments — from childhood adventures to graduation day.</p>
+            <p class="section-subtitle">Capture a moment tonight or send your favorite photos of Maple.</p>
         </div>
 
         <div class="gallery-filters" id="gallery-filters">

@@ -268,10 +268,25 @@ function mgPost(action, data) {
 
             if (data.success) {
                 showMsg(data.data.message, 'success');
-                mgToast('Photo uploaded! It will appear after review. 📸', 'success');
+                mgToast('Memory added to the gallery!', 'success');
                 form.reset();
                 preview.innerHTML = '';
                 fileLabel.textContent = 'Choose a photo…';
+                // Instantly add to gallery grid
+                if (data.data.thumb) {
+                    const grid = document.getElementById('gallery-grid');
+                    if (grid) {
+                        const caption = data.data.caption || data.data.name;
+                        const div = document.createElement('div');
+                        div.className = 'gallery-item';
+                        div.dataset.cat = 'party';
+                        div.dataset.full = data.data.full || data.data.thumb;
+                        div.dataset.caption = caption;
+                        div.innerHTML = `<img src="${data.data.thumb}" alt="${caption}" loading="lazy">
+                            <div class="gallery-overlay"><span class="gallery-overlay-text">${caption}</span></div>`;
+                        grid.prepend(div);
+                    }
+                }
             } else {
                 showMsg(data.data?.message || 'Upload failed. Please try again.', 'error');
             }
@@ -290,82 +305,12 @@ function mgPost(action, data) {
     }
 })();
 
-// Admin photo moderation (global so inline onclick handlers can call them)
-function mgApprovePhoto(id) {
-    mgPost('mg_approve_photo', { photo_id: id }).then(res => {
-        if (res.success) {
-            document.getElementById(`pending-${id}`)?.remove();
-            mgToast('Photo approved and added to gallery! ✅', 'success');
-        }
-    });
-}
-
-function mgRejectPhoto(id) {
-    if (!confirm('Permanently delete this photo?')) return;
-    mgPost('mg_reject_photo', { photo_id: id }).then(res => {
-        if (res.success) {
-            document.getElementById(`pending-${id}`)?.remove();
-            mgToast('Photo removed.', 'default');
-        }
-    });
-}
 
 /* ── Quiz ────────────────────────────────────────────────────── */
-const QUIZ_QUESTIONS = [
-    {
-        q: 'What career is Maple pursuing after graduation?',
-        opts: ['EMT / Emergency Medical Technician','Nurse Practitioner','Firefighter','Paramedic'],
-        correct: 0,
-        fact: 'Maple is passionate about emergency medicine and becoming a certified EMT to serve her community!',
-    },
-    {
-        q: "What is Maple's favorite season?",
-        opts: ['Summer','Autumn','Spring','Winter'],
-        correct: 1,
-        fact: 'Maple loves the golden colors and crisp air of autumn — fitting for a farm party!',
-    },
-    {
-        q: 'If Maple could travel anywhere, where would she go?',
-        opts: ['Iceland','Italy','Japan','New Zealand'],
-        correct: 2,
-        fact: "Japan has always been at the top of Maple's travel bucket list!",
-    },
-    {
-        q: "What is Maple's go-to comfort food?",
-        opts: ['Tacos','Mac and Cheese','Pizza','Ramen'],
-        correct: 3,
-        fact: "Maple never says no to a big bowl of ramen on a cold evening!",
-    },
-    {
-        q: "Which best describes Maple's personality?",
-        opts: ['Calm & Introspective','Bold & Adventurous','Warm & Empathetic','Witty & Sarcastic'],
-        correct: 2,
-        fact: "Maple's warmth and empathy are exactly what makes her such a perfect fit for a career in emergency medicine.",
-    },
-    {
-        q: "What is Maple's hidden talent?",
-        opts: ['Playing the guitar','Speed reading','Baking sourdough bread','Painting watercolors'],
-        correct: 2,
-        fact: 'Maple can bake an amazing loaf of sourdough — she started during the pandemic and never stopped!',
-    },
-    {
-        q: "What's Maple's favorite way to decompress?",
-        opts: ['Hiking outdoors','Watching movies','Reading a good book','Listening to podcasts'],
-        correct: 0,
-        fact: "Maple loves getting out in nature — trail walks clear her head like nothing else.",
-    },
-    {
-        q: 'Which quote best resonates with Maple?',
-        opts: [
-            '"Be the change you wish to see in the world."',
-            '"In the middle of difficulty lies opportunity."',
-            '"The purpose of life is to contribute in some way to making things better."',
-            '"You miss 100% of the shots you don\'t take."',
-        ],
-        correct: 2,
-        fact: 'Maple lives by this mindset — she is driven by purpose and a desire to make life better for those around her.',
-    },
-];
+// Questions are managed in WP Admin → Quiz Questions and injected via wp_localize_script
+const QUIZ_QUESTIONS = (typeof mapleGallo !== 'undefined' && Array.isArray(mapleGallo.questions) && mapleGallo.questions.length)
+    ? mapleGallo.questions
+    : [];
 
 let quizState = {
     playerName:   '',

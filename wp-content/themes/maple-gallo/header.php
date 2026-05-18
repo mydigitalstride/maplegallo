@@ -15,7 +15,6 @@
         <nav class="site-nav" id="site-nav" aria-label="Primary">
             <ul>
                 <li><a href="#about">Their Story</a></li>
-                <li><a href="#schedule">Schedule</a></li>
                 <li><a href="#gallery">Gallery</a></li>
                 <li><a href="#upload">Share a Photo</a></li>
                 <li><a href="#quiz">Trivia</a></li>

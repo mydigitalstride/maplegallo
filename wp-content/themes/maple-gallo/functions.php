@@ -6,13 +6,12 @@ add_action('after_setup_theme', function () {
     add_theme_support('title-tag');
     add_theme_support('post-thumbnails');
     add_theme_support('html5', ['search-form','comment-form','comment-list','gallery','caption','style','script']);
-
     register_nav_menus(['primary' => __('Primary Menu', 'maple-gallo')]);
 });
 
 // ── Enqueue Assets ───────────────────────────────────────────
 add_action('wp_enqueue_scripts', function () {
-    $ver = '1.0.0';
+    $ver = '1.0.1';
     $uri = get_template_directory_uri();
 
     wp_enqueue_style('google-fonts',
@@ -26,6 +25,7 @@ add_action('wp_enqueue_scripts', function () {
         'ajaxUrl'   => admin_url('admin-ajax.php'),
         'nonce'     => wp_create_nonce('maple_gallo_nonce'),
         'partyDate' => get_option('maple_party_date', '2026-06-15T18:00:00'),
+        'questions' => mg_get_quiz_questions(),
     ]);
 });
 
@@ -33,9 +33,9 @@ add_action('wp_enqueue_scripts', function () {
 add_action('init', function () {
     register_post_type('mg_photo', [
         'labels' => [
-            'name'          => 'Gallery Photos',
-            'singular_name' => 'Photo',
-            'add_new_item'  => 'Add New Photo',
+            'name'          => 'Memories',
+            'singular_name' => 'Memory',
+            'add_new_item'  => 'Add New Memory',
         ],
         'public'       => false,
         'show_ui'      => true,
@@ -75,7 +75,7 @@ add_action('init', function () {
     ]);
 });
 
-// ── AJAX: Upload Photo ───────────────────────────────────────
+// ── AJAX: Upload Photo (auto-publish, no review) ─────────────
 add_action('wp_ajax_nopriv_mg_upload_photo', 'mg_handle_photo_upload');
 add_action('wp_ajax_mg_upload_photo',        'mg_handle_photo_upload');
 
@@ -88,7 +88,6 @@ function mg_handle_photo_upload() {
     if (empty($name)) {
         wp_send_json_error(['message' => 'Please enter your name.']);
     }
-
     if (empty($_FILES['photo'])) {
         wp_send_json_error(['message' => 'No photo selected.']);
     }
@@ -101,14 +100,11 @@ function mg_handle_photo_upload() {
     if (!in_array($_FILES['photo']['type'], $allowed_types, true)) {
         wp_send_json_error(['message' => 'Only JPEG, PNG, GIF, or WebP images are allowed.']);
     }
-
-    // 10 MB limit
     if ($_FILES['photo']['size'] > 10 * 1024 * 1024) {
         wp_send_json_error(['message' => 'Photo must be under 10 MB.']);
     }
 
     $attachment_id = media_handle_upload('photo', 0);
-
     if (is_wp_error($attachment_id)) {
         wp_send_json_error(['message' => $attachment_id->get_error_message()]);
     }
@@ -116,7 +112,7 @@ function mg_handle_photo_upload() {
     $post_id = wp_insert_post([
         'post_type'   => 'mg_photo',
         'post_title'  => $name,
-        'post_status' => 'pending',
+        'post_status' => 'publish',   // auto-publish, no review needed
         'meta_input'  => [
             '_mg_caption'       => $caption,
             '_mg_attachment_id' => $attachment_id,
@@ -132,12 +128,15 @@ function mg_handle_photo_upload() {
     set_post_thumbnail($post_id, $attachment_id);
 
     wp_send_json_success([
-        'message'   => 'Your photo has been submitted! It will appear in the gallery after review.',
-        'thumb_url' => wp_get_attachment_image_url($attachment_id, 'thumbnail'),
+        'message'  => 'Memory added! Your photo is now in the gallery.',
+        'thumb'    => wp_get_attachment_image_url($attachment_id, 'medium'),
+        'full'     => wp_get_attachment_image_url($attachment_id, 'large'),
+        'name'     => $name,
+        'caption'  => $caption,
     ]);
 }
 
-// ── AJAX: Get Approved Photos ────────────────────────────────
+// ── AJAX: Get Published Photos ───────────────────────────────
 add_action('wp_ajax_nopriv_mg_get_photos', 'mg_get_photos');
 add_action('wp_ajax_mg_get_photos',        'mg_get_photos');
 
@@ -145,7 +144,6 @@ function mg_get_photos() {
     check_ajax_referer('maple_gallo_nonce', 'nonce');
 
     $category = sanitize_key($_POST['category'] ?? 'all');
-
     $args = [
         'post_type'      => 'mg_photo',
         'post_status'    => 'publish',
@@ -153,14 +151,12 @@ function mg_get_photos() {
         'orderby'        => 'date',
         'order'          => 'DESC',
     ];
-
     if ($category !== 'all') {
         $args['meta_query'] = [['key' => '_mg_category', 'value' => $category]];
     }
 
     $photos = get_posts($args);
     $data   = [];
-
     foreach ($photos as $photo) {
         $att_id = get_post_meta($photo->ID, '_mg_attachment_id', true);
         $data[] = [
@@ -169,31 +165,11 @@ function mg_get_photos() {
             'caption' => get_post_meta($photo->ID, '_mg_caption', true),
             'thumb'   => wp_get_attachment_image_url($att_id, 'medium'),
             'full'    => wp_get_attachment_image_url($att_id, 'large'),
-            'cat'     => get_post_meta($photo->ID, '_mg_category', true),
+            'cat'     => get_post_meta($photo->ID, '_mg_category', true) ?: 'party',
         ];
     }
-
     wp_send_json_success(['photos' => $data]);
 }
-
-// ── AJAX: Admin Approve Photo ────────────────────────────────
-add_action('wp_ajax_mg_approve_photo', function () {
-    check_ajax_referer('maple_gallo_nonce', 'nonce');
-    if (!current_user_can('manage_options')) wp_send_json_error();
-
-    $id = intval($_POST['photo_id'] ?? 0);
-    wp_update_post(['ID' => $id, 'post_status' => 'publish']);
-    wp_send_json_success();
-});
-
-add_action('wp_ajax_mg_reject_photo', function () {
-    check_ajax_referer('maple_gallo_nonce', 'nonce');
-    if (!current_user_can('manage_options')) wp_send_json_error();
-
-    $id = intval($_POST['photo_id'] ?? 0);
-    wp_delete_post($id, true);
-    wp_send_json_success();
-});
 
 // ── AJAX: Submit Quiz Score ──────────────────────────────────
 add_action('wp_ajax_nopriv_mg_submit_score', 'mg_submit_score');
@@ -210,7 +186,6 @@ function mg_submit_score() {
     if (empty($name) || $total < 1) {
         wp_send_json_error(['message' => 'Invalid submission.']);
     }
-
     $score = max(0, min($score, $total));
 
     wp_insert_post([
@@ -224,7 +199,6 @@ function mg_submit_score() {
             '_mg_pct'     => round(($score / $total) * 100),
         ],
     ]);
-
     wp_send_json_success(['message' => 'Score saved!']);
 }
 
@@ -256,7 +230,6 @@ function mg_get_leaderboard() {
             'date'    => get_the_date('M j', $entry),
         ];
     }
-
     wp_send_json_success(['scores' => $data]);
 }
 
@@ -280,9 +253,9 @@ function mg_submit_story() {
         'post_title'  => $author,
         'post_status' => 'publish',
         'meta_input'  => [
-            '_mg_story_title' => $title,
-            '_mg_story_body'  => $body,
-            '_mg_submitted_at'=> current_time('mysql'),
+            '_mg_story_title'  => $title,
+            '_mg_story_body'   => $body,
+            '_mg_submitted_at' => current_time('mysql'),
         ],
     ]);
 
@@ -327,11 +300,78 @@ function mg_get_stories() {
             'date'   => get_the_date('M j', $s),
         ];
     }
-
     wp_send_json_success(['stories' => $data]);
 }
 
-// ── Settings Page ─────────────────────────────────────────────
+// ── Quiz Questions Helper ─────────────────────────────────────
+function mg_get_quiz_questions(): array {
+    $saved = get_option('maple_quiz_questions', '');
+    if ($saved) {
+        $decoded = json_decode($saved, true);
+        if (is_array($decoded) && count($decoded)) return $decoded;
+    }
+    return mg_default_quiz_questions();
+}
+
+function mg_default_quiz_questions(): array {
+    return [
+        [
+            'q'       => 'What certification is Maple earning alongside their high school diploma?',
+            'opts'    => ['EMT / Emergency Medical Technician','Nurse Aide','Firefighter I','Phlebotomist'],
+            'correct' => 0,
+            'fact'    => 'Maple is earning their EMT certification at the same time as graduating high school — an incredible double achievement!',
+        ],
+        [
+            'q'       => "What is Maple's favorite season?",
+            'opts'    => ['Summer','Autumn','Spring','Winter'],
+            'correct' => 1,
+            'fact'    => 'Maple loves the golden colors and crisp air of autumn — fitting for a farm party!',
+        ],
+        [
+            'q'       => 'If Maple could travel anywhere in the world, where would they go?',
+            'opts'    => ['Iceland','Italy','Japan','New Zealand'],
+            'correct' => 2,
+            'fact'    => "Japan has always been at the top of Maple's travel bucket list!",
+        ],
+        [
+            'q'       => "What is Maple's go-to comfort food?",
+            'opts'    => ['Tacos','Mac and Cheese','Pizza','Ramen'],
+            'correct' => 3,
+            'fact'    => "Maple never says no to a big bowl of ramen on a cold evening!",
+        ],
+        [
+            'q'       => "Which best describes Maple's personality?",
+            'opts'    => ['Calm & Introspective','Bold & Adventurous','Warm & Empathetic','Witty & Sarcastic'],
+            'correct' => 2,
+            'fact'    => "Maple's warmth and empathy are exactly what makes them such a perfect fit for a career in emergency medicine.",
+        ],
+        [
+            'q'       => "What is Maple's hidden talent?",
+            'opts'    => ['Playing the guitar','Speed reading','Baking sourdough bread','Painting watercolors'],
+            'correct' => 2,
+            'fact'    => 'Maple can bake an amazing loaf of sourdough — they started during the pandemic and never stopped!',
+        ],
+        [
+            'q'       => "What's Maple's favorite way to decompress?",
+            'opts'    => ['Hiking outdoors','Watching movies','Reading a good book','Listening to podcasts'],
+            'correct' => 0,
+            'fact'    => "Maple loves getting out in nature — trail walks clear their head like nothing else.",
+        ],
+        [
+            'q'       => 'Which quote best resonates with Maple?',
+            'opts'    => [
+                '"Be the change you wish to see in the world."',
+                '"In the middle of difficulty lies opportunity."',
+                '"The purpose of life is to contribute in some way to making things better."',
+                '"You miss 100% of the shots you don\'t take."',
+            ],
+            'correct' => 2,
+            'fact'    => 'Maple lives by this mindset — driven by purpose and a desire to make life better for those around them.',
+        ],
+    ];
+}
+
+// ── Admin Menu ────────────────────────────────────────────────
 add_action('admin_menu', function () {
     add_menu_page(
         'Maple Gallo Party',
@@ -342,8 +382,17 @@ add_action('admin_menu', function () {
         'dashicons-palmtree',
         3
     );
+    add_submenu_page(
+        'maple-gallo-settings',
+        'Quiz Questions',
+        'Quiz Questions',
+        'manage_options',
+        'maple-gallo-quiz',
+        'mg_quiz_admin_page'
+    );
 });
 
+// ── Settings Page ─────────────────────────────────────────────
 function mg_settings_page() {
     if (isset($_POST['mg_save_settings'])) {
         check_admin_referer('mg_settings');
@@ -354,13 +403,13 @@ function mg_settings_page() {
         echo '<div class="updated"><p>Settings saved!</p></div>';
     }
 
-    $date     = get_option('maple_party_date',  '2026-06-15T18:00:00');
-    $venue    = get_option('maple_party_venue', 'The Old Oak Farm');
-    $venmo    = get_option('maple_venmo_url',   'https://venmo.com/maplegallo');
-    $about    = get_option('maple_about_text',  "Maple Gallo is officially a graduate! After years of hard work, late nights studying, and an unstoppable drive to serve their community, Maple has earned their high school diploma and their EMT Certification — at the same time.\n\nJoin us as we celebrate this incredible double milestone at a rustic farm gathering filled with good food, great music, and even better company.");
+    $date  = get_option('maple_party_date',  '2026-06-15T18:00:00');
+    $venue = get_option('maple_party_venue', 'The Old Oak Farm');
+    $venmo = get_option('maple_venmo_url',   'https://venmo.com/maplegallo');
+    $about = get_option('maple_about_text',  "Maple Gallo is officially a graduate! After years of hard work, late nights studying, and an unstoppable drive to serve their community, Maple has earned their high school diploma and their EMT Certification — at the same time.\n\nJoin us as we celebrate this incredible double milestone at a rustic farm gathering filled with good food, great music, and even better company.");
 
-    $story_count = wp_count_posts('mg_story')->publish ?? 0;
-
+    $story_count = (int) (wp_count_posts('mg_story')->publish ?? 0);
+    $photo_count = (int) (wp_count_posts('mg_photo')->publish ?? 0);
     ?>
     <div class="wrap">
         <h1>🌿 Maple Gallo Party Settings</h1>
@@ -379,7 +428,7 @@ function mg_settings_page() {
                     <th>Venmo Link (EMT Fund)</th>
                     <td>
                         <input type="url" name="venmo_url" value="<?php echo esc_attr($venmo); ?>" class="regular-text" placeholder="https://venmo.com/username">
-                        <p class="description">Full Venmo profile URL — e.g. https://venmo.com/Maple-Gallo</p>
+                        <p class="description">Full Venmo profile URL, e.g. https://venmo.com/Maple-Gallo</p>
                     </td>
                 </tr>
                 <tr>
@@ -393,9 +442,146 @@ function mg_settings_page() {
         </form>
 
         <hr>
-        <h2>Stories &amp; Tips</h2>
-        <p><strong><?php echo (int) $story_count; ?></strong> stories have been shared so far.</p>
-        <a href="<?php echo admin_url('edit.php?post_type=mg_story'); ?>" class="button">Manage Stories</a>
+        <h2>Site Stats</h2>
+        <ul style="font-size:14px;line-height:2">
+            <li><strong><?php echo $photo_count; ?></strong> memories uploaded — <a href="<?php echo admin_url('edit.php?post_type=mg_photo'); ?>">View all</a></li>
+            <li><strong><?php echo $story_count; ?></strong> stories &amp; tips shared — <a href="<?php echo admin_url('edit.php?post_type=mg_story'); ?>">View all</a></li>
+        </ul>
+        <p><a href="<?php echo admin_url('admin.php?page=maple-gallo-quiz'); ?>" class="button button-secondary">Manage Quiz Questions →</a></p>
+    </div>
+    <?php
+}
+
+// ── Quiz Questions Admin Page ─────────────────────────────────
+function mg_quiz_admin_page() {
+    if (isset($_POST['mg_save_quiz'])) {
+        check_admin_referer('mg_quiz');
+        $raw = $_POST['questions'] ?? [];
+        $clean = [];
+        foreach ($raw as $q) {
+            $opts = array_map('sanitize_text_field', (array) ($q['opts'] ?? []));
+            $clean[] = [
+                'q'       => sanitize_text_field($q['q'] ?? ''),
+                'opts'    => array_values($opts),
+                'correct' => intval($q['correct'] ?? 0),
+                'fact'    => sanitize_textarea_field($q['fact'] ?? ''),
+            ];
+        }
+        $clean = array_filter($clean, fn($q) => !empty($q['q']));
+        update_option('maple_quiz_questions', json_encode(array_values($clean)));
+        echo '<div class="updated"><p>Quiz questions saved!</p></div>';
+    }
+
+    $questions = mg_get_quiz_questions();
+    ?>
+    <div class="wrap">
+        <h1>Quiz Questions</h1>
+        <p>Add, edit, or remove trivia questions about Maple. Guests answer these during the quiz.</p>
+
+        <form method="post" id="quiz-admin-form">
+            <?php wp_nonce_field('mg_quiz'); ?>
+            <div id="questions-list">
+                <?php foreach ($questions as $i => $q): ?>
+                <?php mg_render_question_row($i, $q); ?>
+                <?php endforeach; ?>
+            </div>
+
+            <p style="margin-top:16px;">
+                <button type="button" class="button" id="add-question-btn">+ Add Question</button>
+            </p>
+
+            <p class="submit">
+                <input type="submit" name="mg_save_quiz" class="button-primary" value="Save All Questions">
+            </p>
+        </form>
+    </div>
+
+    <!-- Template for new question rows -->
+    <template id="question-template">
+        <?php mg_render_question_row('__INDEX__', ['q'=>'','opts'=>['','','',''],'correct'=>0,'fact'=>'']); ?>
+    </template>
+
+    <style>
+        .question-row { background:#fff; border:1px solid #ddd; border-radius:6px; padding:20px; margin-bottom:16px; }
+        .question-row h3 { margin:0 0 16px; display:flex; justify-content:space-between; align-items:center; }
+        .q-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+        .q-full { grid-column:1/-1; }
+        .q-grid label { display:block; font-weight:600; margin-bottom:4px; font-size:13px; }
+        .q-grid input, .q-grid textarea, .q-grid select { width:100%; }
+        .correct-row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-top:4px; }
+        .correct-row label { font-weight:normal; display:flex; align-items:center; gap:4px; cursor:pointer; }
+    </style>
+    <script>
+    let qCount = <?php echo count($questions); ?>;
+    document.getElementById('add-question-btn').addEventListener('click', () => {
+        const tpl   = document.getElementById('question-template').innerHTML;
+        const html  = tpl.replace(/__INDEX__/g, qCount);
+        const div   = document.createElement('div');
+        div.innerHTML = html;
+        document.getElementById('questions-list').appendChild(div.firstElementChild);
+        qCount++;
+        renumberRows();
+    });
+    document.getElementById('questions-list').addEventListener('click', e => {
+        if (e.target.classList.contains('remove-question-btn')) {
+            if (!confirm('Remove this question?')) return;
+            e.target.closest('.question-row').remove();
+            renumberRows();
+        }
+    });
+    function renumberRows() {
+        document.querySelectorAll('.question-row').forEach((row, i) => {
+            row.querySelector('.q-number').textContent = `Question ${i + 1}`;
+        });
+    }
+    </script>
+    <?php
+}
+
+function mg_render_question_row(int|string $i, array $q): void {
+    $letters = ['A','B','C','D'];
+    $correct = (int) ($q['correct'] ?? 0);
+    ?>
+    <div class="question-row">
+        <h3>
+            <span class="q-number">Question <?php echo is_int($i) ? $i + 1 : ''; ?></span>
+            <button type="button" class="button-link remove-question-btn" style="color:#b32d2e;">Remove</button>
+        </h3>
+        <div class="q-grid">
+            <div class="q-full">
+                <label>Question Text</label>
+                <input type="text" name="questions[<?php echo $i; ?>][q]"
+                       value="<?php echo esc_attr($q['q'] ?? ''); ?>"
+                       placeholder="e.g. What is Maple's favorite season?" required>
+            </div>
+            <?php foreach ([0,1,2,3] as $oi): ?>
+            <div>
+                <label>Option <?php echo $letters[$oi]; ?></label>
+                <input type="text" name="questions[<?php echo $i; ?>][opts][<?php echo $oi; ?>]"
+                       value="<?php echo esc_attr($q['opts'][$oi] ?? ''); ?>"
+                       placeholder="Option <?php echo $letters[$oi]; ?>">
+            </div>
+            <?php endforeach; ?>
+            <div class="q-full">
+                <label>Correct Answer</label>
+                <div class="correct-row">
+                    <?php foreach ([0,1,2,3] as $oi): ?>
+                    <label>
+                        <input type="radio" name="questions[<?php echo $i; ?>][correct]"
+                               value="<?php echo $oi; ?>"
+                               <?php checked($correct, $oi); ?>>
+                        <?php echo $letters[$oi]; ?>
+                    </label>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <div class="q-full">
+                <label>Fun Fact (shown after answer)</label>
+                <textarea name="questions[<?php echo $i; ?>][fact]"
+                          rows="2"
+                          placeholder="A fun fact revealed after the guest answers…"><?php echo esc_textarea($q['fact'] ?? ''); ?></textarea>
+            </div>
+        </div>
     </div>
     <?php
 }

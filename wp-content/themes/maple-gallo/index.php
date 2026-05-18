@@ -10,20 +10,16 @@ $venmo_url   = get_option('maple_venmo_url',   'https://venmo.com/maplegallo');
 $party_datetime = new DateTime($party_date);
 $formatted_date = $party_datetime->format('F j, Y');
 $formatted_time = $party_datetime->format('g:i A');
+
+$quiz_count = count(mg_get_quiz_questions());
 ?>
 
 <!-- ╔══════════════════════════════════════════════════════════╗
      ║  HERO                                                    ║
      ╚══════════════════════════════════════════════════════════╝ -->
 <section class="hero" id="home">
-
-    <!-- Decorative eucalyptus branches (inline SVG) -->
-    <div class="hero-eucalyptus-left" aria-hidden="true">
-        <?php echo mg_eucalyptus_svg(); ?>
-    </div>
-    <div class="hero-eucalyptus-right" aria-hidden="true">
-        <?php echo mg_eucalyptus_svg(); ?>
-    </div>
+    <div class="hero-eucalyptus-left" aria-hidden="true"><?php echo mg_eucalyptus_svg(); ?></div>
+    <div class="hero-eucalyptus-right" aria-hidden="true"><?php echo mg_eucalyptus_svg(); ?></div>
 
     <div class="hero-content">
         <span class="hero-eyebrow">You're Invited to Celebrate</span>
@@ -35,17 +31,17 @@ $formatted_time = $party_datetime->format('g:i A');
 
         <div class="hero-details">
             <div class="hero-detail">
-                <span class="hero-detail-icon">📅</span>
+                <svg class="hero-detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                 <span class="hero-detail-label">Date</span>
                 <span class="hero-detail-value"><?php echo esc_html($formatted_date); ?></span>
             </div>
             <div class="hero-detail">
-                <span class="hero-detail-icon">🕕</span>
+                <svg class="hero-detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                 <span class="hero-detail-label">Time</span>
                 <span class="hero-detail-value"><?php echo esc_html($formatted_time); ?></span>
             </div>
             <div class="hero-detail">
-                <span class="hero-detail-icon">🌾</span>
+                <svg class="hero-detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                 <span class="hero-detail-label">Venue</span>
                 <span class="hero-detail-value"><?php echo esc_html($party_venue); ?></span>
             </div>
@@ -71,127 +67,37 @@ $formatted_time = $party_datetime->format('g:i A');
 <section class="countdown-bar" id="countdown">
     <h3>Counting down to the celebration</h3>
     <div class="countdown-units">
-        <div class="countdown-unit">
-            <span class="countdown-number" id="cd-days">--</span>
-            <span class="countdown-label">Days</span>
-        </div>
-        <div class="countdown-unit">
-            <span class="countdown-number" id="cd-hours">--</span>
-            <span class="countdown-label">Hours</span>
-        </div>
-        <div class="countdown-unit">
-            <span class="countdown-number" id="cd-minutes">--</span>
-            <span class="countdown-label">Minutes</span>
-        </div>
-        <div class="countdown-unit">
-            <span class="countdown-number" id="cd-seconds">--</span>
-            <span class="countdown-label">Seconds</span>
-        </div>
+        <div class="countdown-unit"><span class="countdown-number" id="cd-days">--</span><span class="countdown-label">Days</span></div>
+        <div class="countdown-unit"><span class="countdown-number" id="cd-hours">--</span><span class="countdown-label">Hours</span></div>
+        <div class="countdown-unit"><span class="countdown-number" id="cd-minutes">--</span><span class="countdown-label">Minutes</span></div>
+        <div class="countdown-unit"><span class="countdown-number" id="cd-seconds">--</span><span class="countdown-label">Seconds</span></div>
     </div>
 </section>
 
 <!-- ╔══════════════════════════════════════════════════════════╗
-     ║  ABOUT / STORY                                           ║
+     ║  ABOUT                                                   ║
      ╚══════════════════════════════════════════════════════════╝ -->
 <section class="about-section section-pad" id="about">
     <div class="container">
         <div class="about-grid">
             <div class="about-img-wrap">
-                <?php $hero_img = get_template_directory_uri() . '/images/maple-hero.jpg'; ?>
-                <img src="<?php echo esc_url($hero_img); ?>"
+                <img src="<?php echo esc_url(get_template_directory_uri() . '/images/maple-hero.jpg'); ?>"
                      alt="Maple Gallo"
-                     onerror="this.src='https://placehold.co/480x600/7a9e87/fff?text=Maple+🌿'">
-                <div class="about-img-badge">
-                    <span class="badge-year">2026</span>
-                    Graduate
-                </div>
+                     onerror="this.src='https://placehold.co/480x600/7a9e87/fff?text=Maple'">
+                <div class="about-img-badge"><span class="badge-year">2026</span>Graduate</div>
             </div>
-
             <div class="about-text">
                 <span class="section-label">Their Story</span>
                 <h2 class="section-title">From Student<br>to EMT Hero</h2>
-                <?php
-                $paragraphs = explode("\n\n", $about_text);
-                foreach ($paragraphs as $p):
-                    if (trim($p)):
-                ?>
+                <?php foreach (explode("\n\n", $about_text) as $p): if (trim($p)): ?>
                 <p><?php echo esc_html(trim($p)); ?></p>
                 <?php endif; endforeach; ?>
-
                 <div class="about-stats">
-                    <div class="about-stat">
-                        <span class="about-stat-number">K–12</span>
-                        <span class="about-stat-label">Years of School</span>
-                    </div>
-                    <div class="about-stat">
-                        <span class="about-stat-number">EMT</span>
-                        <span class="about-stat-label">Certified</span>
-                    </div>
-                    <div class="about-stat">
-                        <span class="about-stat-number">∞</span>
-                        <span class="about-stat-label">Lives to Impact</span>
-                    </div>
-                    <div class="about-stat">
-                        <span class="about-stat-number">🌿</span>
-                        <span class="about-stat-label">Farm Party!</span>
-                    </div>
+                    <div class="about-stat"><span class="about-stat-number">K–12</span><span class="about-stat-label">Years of School</span></div>
+                    <div class="about-stat"><span class="about-stat-number">EMT</span><span class="about-stat-label">Certified</span></div>
+                    <div class="about-stat"><span class="about-stat-number">&#8734;</span><span class="about-stat-label">Lives to Impact</span></div>
+                    <div class="about-stat"><span class="about-stat-number">2026</span><span class="about-stat-label">Farm Party!</span></div>
                 </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ╔══════════════════════════════════════════════════════════╗
-     ║  SCHEDULE / TIMELINE                                     ║
-     ╚══════════════════════════════════════════════════════════╝ -->
-<section class="schedule-section section-pad" id="schedule">
-    <div class="container text-center">
-        <span class="section-label">Plan Your Evening</span>
-        <h2 class="section-title">Party Schedule</h2>
-        <p class="section-subtitle">An evening at the farm — good food, good people, and great memories.</p>
-
-        <div class="timeline">
-            <div class="timeline-item">
-                <div class="timeline-dot"></div>
-                <div class="timeline-time">6:00 PM</div>
-                <div class="timeline-title">Guests Arrive</div>
-                <div class="timeline-desc">Welcome drinks &amp; mingle out on the farm</div>
-            </div>
-            <div class="timeline-item">
-                <div class="timeline-dot"></div>
-                <div class="timeline-time">6:30 PM</div>
-                <div class="timeline-title">Dinner Is Served</div>
-                <div class="timeline-desc">Farm-to-table feast at the wooden tables</div>
-            </div>
-            <div class="timeline-item">
-                <div class="timeline-dot"></div>
-                <div class="timeline-time">7:30 PM</div>
-                <div class="timeline-title">Toasts &amp; Speeches</div>
-                <div class="timeline-desc">Celebrating Maple's incredible journey</div>
-            </div>
-            <div class="timeline-item">
-                <div class="timeline-dot"></div>
-                <div class="timeline-time">8:00 PM</div>
-                <div class="timeline-title">Maple Gallo Trivia!</div>
-                <div class="timeline-desc">Test your knowledge — compete for the top spot on the leaderboard</div>
-            </div>
-            <div class="timeline-item">
-                <div class="timeline-dot"></div>
-                <div class="timeline-time">8:30 PM</div>
-                <div class="timeline-title">Dancing &amp; Music</div>
-                <div class="timeline-desc">Live music and dancing under the stars</div>
-            </div>
-            <div class="timeline-item">
-                <div class="timeline-dot"></div>
-                <div class="timeline-time">9:30 PM</div>
-                <div class="timeline-title">Cake &amp; Desserts</div>
-                <div class="timeline-desc">Sweet endings to a perfect night</div>
-            </div>
-            <div class="timeline-item">
-                <div class="timeline-dot"></div>
-                <div class="timeline-time">10:00 PM</div>
-                <div class="timeline-title">Photo Booth Open</div>
-                <div class="timeline-desc">Capture the memories &amp; upload your favorites</div>
             </div>
         </div>
     </div>
@@ -219,7 +125,7 @@ $formatted_time = $party_datetime->format('g:i A');
 
         <div class="gallery-grid" id="gallery-grid">
             <?php
-            $seed_photos = [
+            $seed = [
                 ['label'=>'Childhood',    'cat'=>'childhood', 'color'=>'b2cdb9'],
                 ['label'=>'School Days',  'cat'=>'school',    'color'=>'c9956c'],
                 ['label'=>'Study Nights', 'cat'=>'school',    'color'=>'7a9e87'],
@@ -227,15 +133,14 @@ $formatted_time = $party_datetime->format('g:i A');
                 ['label'=>'Best Friends', 'cat'=>'friends',   'color'=>'8b5e3c'],
                 ['label'=>'Family Fun',   'cat'=>'friends',   'color'=>'a8c4a2'],
             ];
-            foreach ($seed_photos as $sp):
+            foreach ($seed as $sp):
             ?>
-            <div class="gallery-item" data-cat="<?php echo esc_attr($sp['cat']); ?>" data-full="https://placehold.co/900x700/<?php echo $sp['color']; ?>/fff?text=<?php echo urlencode($sp['label']); ?>" data-caption="<?php echo esc_attr($sp['label']); ?>">
+            <div class="gallery-item" data-cat="<?php echo esc_attr($sp['cat']); ?>"
+                 data-full="https://placehold.co/900x700/<?php echo $sp['color']; ?>/fff?text=<?php echo urlencode($sp['label']); ?>"
+                 data-caption="<?php echo esc_attr($sp['label']); ?>">
                 <img src="https://placehold.co/400x400/<?php echo $sp['color']; ?>/fff?text=<?php echo urlencode($sp['label']); ?>"
-                     alt="<?php echo esc_attr($sp['label']); ?>"
-                     loading="lazy">
-                <div class="gallery-overlay">
-                    <span class="gallery-overlay-text"><?php echo esc_html($sp['label']); ?></span>
-                </div>
+                     alt="<?php echo esc_attr($sp['label']); ?>" loading="lazy">
+                <div class="gallery-overlay"><span class="gallery-overlay-text"><?php echo esc_html($sp['label']); ?></span></div>
             </div>
             <?php endforeach; ?>
         </div>
@@ -258,18 +163,21 @@ $formatted_time = $party_datetime->format('g:i A');
 </div>
 
 <!-- ╔══════════════════════════════════════════════════════════╗
-     ║  UPLOAD PHOTOS                                           ║
+     ║  LEAVE A MEMORY (photo upload — instant gallery)         ║
      ╚══════════════════════════════════════════════════════════╝ -->
 <section class="upload-section section-pad" id="upload">
     <div class="container">
         <div class="text-center">
-            <span class="section-label">Share Your Memories</span>
-            <h2 class="section-title">Upload Your Favorite<br>Photo of Maple</h2>
-            <p class="section-subtitle">Have a special photo of Maple? Share it with everyone! All uploads are reviewed before appearing in the gallery.</p>
+            <span class="section-label">Add to the Album</span>
+            <h2 class="section-title">Leave a Memory</h2>
+            <p class="section-subtitle">Upload a photo of Maple and it appears in the gallery instantly for everyone to see.</p>
         </div>
 
         <div class="upload-box" id="upload-drop-zone">
-            <span class="upload-icon">📸</span>
+            <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                <circle cx="12" cy="13" r="4"/>
+            </svg>
             <h3>Drop your photo here</h3>
             <p>or click to browse — JPEG, PNG, WebP up to 10 MB</p>
 
@@ -287,7 +195,7 @@ $formatted_time = $party_datetime->format('g:i A');
                 <div class="form-group">
                     <label>Photo <span style="color:#c0392b">*</span></label>
                     <label class="file-input-label" for="photo-file">
-                        <span>📁</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;flex-shrink:0" aria-hidden="true"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
                         <span id="file-label-text">Choose a photo…</span>
                         <input type="file" id="photo-file" name="photo" accept="image/jpeg,image/png,image/gif,image/webp" required>
                     </label>
@@ -300,48 +208,10 @@ $formatted_time = $party_datetime->format('g:i A');
                 <div class="upload-message" id="upload-message"></div>
 
                 <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;" id="upload-submit-btn">
-                    Upload Photo ✨
+                    Add to Gallery
                 </button>
             </form>
         </div>
-
-        <?php if (is_user_logged_in() && current_user_can('manage_options')): ?>
-        <div class="pending-uploads-section">
-            <h3 style="text-align:center;margin-bottom:8px;">Pending Uploads (Admin Review)</h3>
-            <p style="text-align:center;color:var(--soft-gray);font-size:.9rem;margin-bottom:24px;">Approve or reject guest photo submissions below.</p>
-            <div class="pending-grid" id="pending-grid">
-                <?php
-                $pending = get_posts([
-                    'post_type'      => 'mg_photo',
-                    'post_status'    => 'pending',
-                    'posts_per_page' => 30,
-                ]);
-                foreach ($pending as $p):
-                    $att_id = get_post_meta($p->ID, '_mg_attachment_id', true);
-                    $thumb  = wp_get_attachment_image_url($att_id, 'medium');
-                ?>
-                <div class="pending-card" id="pending-<?php echo $p->ID; ?>">
-                    <img src="<?php echo esc_url($thumb ?: 'https://placehold.co/200x200/ccc/fff?text=Photo'); ?>"
-                         alt="<?php echo esc_attr($p->post_title); ?>">
-                    <div class="pending-card-meta">
-                        <div class="pending-card-name"><?php echo esc_html($p->post_title); ?></div>
-                        <div class="pending-card-caption"><?php echo esc_html(get_post_meta($p->ID, '_mg_caption', true)); ?></div>
-                        <span class="pending-badge pending">Pending Review</span>
-                        <div style="margin-top:10px;display:flex;gap:8px;">
-                            <button class="btn btn-primary" style="padding:6px 16px;font-size:.8rem;"
-                                    onclick="mgApprovePhoto(<?php echo $p->ID; ?>)">Approve</button>
-                            <button class="btn" style="padding:6px 16px;font-size:.8rem;background:#e74c3c;color:#fff;border-color:#e74c3c;"
-                                    onclick="mgRejectPhoto(<?php echo $p->ID; ?>)">Reject</button>
-                        </div>
-                    </div>
-                </div>
-                <?php endforeach; ?>
-                <?php if (empty($pending)): ?>
-                <p style="color:var(--soft-gray);grid-column:1/-1;text-align:center;font-style:italic;">No pending uploads — you're all caught up! 🎉</p>
-                <?php endif; ?>
-            </div>
-        </div>
-        <?php endif; ?>
     </div>
 </section>
 
@@ -357,40 +227,34 @@ $formatted_time = $party_datetime->format('g:i A');
         </div>
 
         <div class="quiz-card" id="quiz-card">
-
-            <!-- Start Screen -->
             <div class="quiz-start" id="quiz-start">
                 <h3>Ready to play?</h3>
-                <p>Answer <?php echo count(mg_get_quiz_questions()); ?> questions about Maple and see how you stack up!</p>
+                <p>Answer <?php echo $quiz_count; ?> questions about Maple and see how you stack up!</p>
                 <input type="text" class="quiz-name-input" id="quiz-player-name" placeholder="Enter your name to start…" maxlength="40">
                 <button class="btn btn-gold" id="quiz-start-btn" onclick="mgStartQuiz()">Start the Quiz!</button>
             </div>
 
-            <!-- Quiz Questions (hidden until started) -->
             <div id="quiz-game" style="display:none;">
                 <div class="quiz-progress-wrap">
                     <div class="quiz-progress-bar">
                         <div class="quiz-progress-fill" id="quiz-progress-fill" style="width:0%"></div>
                     </div>
-                    <span class="quiz-progress-text" id="quiz-progress-text">Question 1 of <?php echo count(mg_get_quiz_questions()); ?></span>
+                    <span class="quiz-progress-text" id="quiz-progress-text">Question 1 of <?php echo $quiz_count; ?></span>
                 </div>
-
                 <div class="quiz-question-number" id="quiz-q-number">Question 1</div>
                 <div class="quiz-question-text" id="quiz-q-text"></div>
                 <div class="quiz-options" id="quiz-options"></div>
                 <div class="quiz-feedback" id="quiz-feedback"></div>
-
                 <div class="quiz-nav">
                     <span id="quiz-score-display" style="color:var(--gold);font-weight:700;">Score: 0</span>
-                    <button class="btn btn-gold" id="quiz-next-btn" onclick="mgNextQuestion()" style="display:none;">Next Question →</button>
+                    <button class="btn btn-gold" id="quiz-next-btn" onclick="mgNextQuestion()" style="display:none;">Next Question &rarr;</button>
                 </div>
             </div>
 
-            <!-- Results (hidden until finished) -->
             <div class="quiz-results" id="quiz-results" style="display:none;">
                 <div class="quiz-score-circle">
                     <span class="quiz-score-number" id="result-score">0</span>
-                    <span class="quiz-score-label" id="result-label">/ <?php echo count(mg_get_quiz_questions()); ?></span>
+                    <span class="quiz-score-label" id="result-label">/ <?php echo $quiz_count; ?></span>
                 </div>
                 <div class="quiz-result-msg" id="result-msg"></div>
                 <p class="quiz-result-sub" id="result-sub"></p>
@@ -399,7 +263,6 @@ $formatted_time = $party_datetime->format('g:i A');
                     <a href="#leaderboard" class="btn btn-outline" style="color:var(--gold-lt);border-color:var(--gold);">View Leaderboard</a>
                 </div>
             </div>
-
         </div>
     </div>
 </section>
@@ -414,21 +277,16 @@ $formatted_time = $party_datetime->format('g:i A');
             <h2 class="section-title">Trivia Leaderboard</h2>
             <p class="section-subtitle">The Maple Gallo experts — can you climb to the top?</p>
         </div>
-
         <div class="leaderboard-table-wrap">
             <div class="leaderboard-header">
-                <span>#</span>
-                <span>Name</span>
+                <span>#</span><span>Name</span>
                 <span style="text-align:center;">Score</span>
                 <span style="text-align:center;">Date</span>
             </div>
             <div id="leaderboard-body">
-                <div class="leaderboard-empty">
-                    <p>No scores yet — be the first to play! 🏆</p>
-                </div>
+                <div class="leaderboard-empty"><p>No scores yet — be the first to play!</p></div>
             </div>
         </div>
-
         <div class="text-center" style="margin-top:24px;">
             <button class="btn btn-outline" onclick="mgLoadLeaderboard()">Refresh Leaderboard</button>
         </div>
@@ -447,82 +305,55 @@ $formatted_time = $party_datetime->format('g:i A');
         </div>
 
         <div class="stories-layout">
-
-            <!-- Submission Form -->
             <div class="story-form-card">
                 <h3>Share Your Wisdom</h3>
                 <p>Your tip or story will appear here for Maple and all the guests to read.</p>
-
                 <form id="story-form">
                     <div class="form-group">
                         <label for="story-author">Your Name <span style="color:#f5a9a0">*</span></label>
                         <input type="text" id="story-author" name="author" placeholder="e.g. Uncle Dave" required maxlength="60">
                     </div>
-
                     <div class="form-group">
                         <label for="story-title">Give It a Title <span style="color:rgba(255,255,255,.4)">(optional)</span></label>
                         <input type="text" id="story-title" name="title" placeholder="e.g. The best advice I ever got…" maxlength="80">
                     </div>
-
                     <div class="form-group">
                         <label for="story-body">Your Tip or Story <span style="color:#f5a9a0">*</span></label>
                         <textarea id="story-body" name="body" rows="6"
-                                  placeholder="Share a memory, a life tip, words of encouragement — anything Maple should carry with them into this next chapter…"
+                                  placeholder="Share a memory, a life tip, words of encouragement…"
                                   maxlength="800" required></textarea>
                         <div class="story-char-count"><span id="story-char-num">0</span> / 800</div>
                     </div>
-
                     <div class="story-submit-msg" id="story-submit-msg"></div>
-
-                    <button type="submit" class="btn btn-gold" style="width:100%;margin-top:8px;">
-                        Leave My Tip ✨
-                    </button>
+                    <button type="submit" class="btn btn-gold" style="width:100%;margin-top:8px;">Leave My Tip</button>
                 </form>
             </div>
 
-            <!-- Stories Display -->
             <div class="stories-display">
-                <h3>💬 What Everyone's Saying</h3>
+                <h3>What Everyone's Saying</h3>
                 <div class="story-cards" id="story-cards">
                     <?php
-                    $stories = get_posts([
-                        'post_type'      => 'mg_story',
-                        'post_status'    => 'publish',
-                        'posts_per_page' => 20,
-                        'orderby'        => 'date',
-                        'order'          => 'DESC',
-                    ]);
+                    $stories = get_posts(['post_type'=>'mg_story','post_status'=>'publish','posts_per_page'=>20,'orderby'=>'date','order'=>'DESC']);
                     if ($stories):
                         foreach ($stories as $s):
-                            $body    = get_post_meta($s->ID, '_mg_story_body', true);
-                            $author  = $s->post_title;
-                            $stitle  = get_post_meta($s->ID, '_mg_story_title', true);
-                            $date    = get_the_date('M j', $s);
-                            $long    = mb_strlen($body) > 200;
+                            $body   = get_post_meta($s->ID, '_mg_story_body', true);
+                            $stitle = get_post_meta($s->ID, '_mg_story_title', true);
+                            $long   = mb_strlen($body) > 200;
                     ?>
                     <div class="story-card">
-                        <?php if ($stitle): ?>
-                        <div class="story-card-title"><?php echo esc_html($stitle); ?></div>
-                        <?php endif; ?>
-                        <div class="story-card-text <?php echo $long ? 'collapsed' : ''; ?>" id="sc-<?php echo $s->ID; ?>">
-                            <?php echo esc_html($body); ?>
-                        </div>
-                        <?php if ($long): ?>
-                        <button class="story-card-expand" onclick="mgExpandStory('sc-<?php echo $s->ID; ?>', this)">Read more</button>
-                        <?php endif; ?>
+                        <?php if ($stitle): ?><div class="story-card-title"><?php echo esc_html($stitle); ?></div><?php endif; ?>
+                        <div class="story-card-text <?php echo $long ? 'collapsed' : ''; ?>" id="sc-<?php echo $s->ID; ?>"><?php echo esc_html($body); ?></div>
+                        <?php if ($long): ?><button class="story-card-expand" onclick="mgExpandStory('sc-<?php echo $s->ID; ?>', this)">Read more</button><?php endif; ?>
                         <div class="story-card-meta">
-                            <span class="story-card-author">— <?php echo esc_html($author); ?></span>
-                            <span class="story-card-date"><?php echo esc_html($date); ?></span>
+                            <span class="story-card-author">— <?php echo esc_html($s->post_title); ?></span>
+                            <span class="story-card-date"><?php echo get_the_date('M j', $s); ?></span>
                         </div>
                     </div>
                     <?php endforeach; else: ?>
-                    <div class="story-empty" id="story-empty">
-                        <p>No stories yet — be the first to leave one! 🌿</p>
-                    </div>
+                    <div class="story-empty" id="story-empty"><p>No stories yet — be the first to leave one!</p></div>
                     <?php endif; ?>
                 </div>
             </div>
-
         </div>
     </div>
 </section>
@@ -536,28 +367,20 @@ $formatted_time = $party_datetime->format('g:i A');
             <span class="section-label">Give the Gift of a Future</span>
             <h2 class="section-title" style="margin-bottom:16px;">Support Maple's<br>EMT Future Fund</h2>
             <p>Maple's journey doesn't stop at graduation. Continuing EMT education, certifications, and equipment all take resources — and every bit of support helps them get there.</p>
-            <p>If you'd like to contribute to Maple's future in emergency medicine, you can send a gift directly via Venmo. Every dollar is a vote of confidence in an incredible next chapter.</p>
-
-            <a href="<?php echo esc_url($venmo_url); ?>"
-               target="_blank"
-               rel="noopener noreferrer"
-               class="venmo-btn">
-                <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <path d="M444.2 64c16.5 27.5 24 55.8 24 91.4 0 113.8-97.2 261.5-176.2 365.6H109.3L64 96.9l152.1-14.3 23.3 184.9c21.6-36.2 48.4-93.3 48.4-132.1 0-21.3-3.6-35.8-9.3-47.9L444.2 64z"/>
-                </svg>
+            <p>Send a gift directly via Venmo. Every dollar is a vote of confidence in an incredible next chapter.</p>
+            <a href="<?php echo esc_url($venmo_url); ?>" target="_blank" rel="noopener noreferrer" class="venmo-btn">
+                <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M444.2 64c16.5 27.5 24 55.8 24 91.4 0 113.8-97.2 261.5-176.2 365.6H109.3L64 96.9l152.1-14.3 23.3 184.9c21.6-36.2 48.4-93.3 48.4-132.1 0-21.3-3.6-35.8-9.3-47.9L444.2 64z"/></svg>
                 Donate via Venmo
             </a>
         </div>
     </div>
 </section>
 
-<!-- Toast container -->
 <div class="toast-container" id="toast-container"></div>
 
 <?php
 get_footer();
 
-// ── Helpers (PHP, only used server-side) ─────────────────────
 function mg_eucalyptus_svg(): string {
     return '<svg viewBox="0 0 200 500" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M100 480 C90 400 60 350 40 280 C20 210 30 140 100 80" stroke="#7a9e87" stroke-width="3" fill="none"/>
@@ -568,63 +391,5 @@ function mg_eucalyptus_svg(): string {
         <ellipse cx="80" cy="120" rx="24" ry="15" fill="#b2cdb9" opacity=".6" transform="rotate(-40 80 120)"/>
         <ellipse cx="70" cy="400" rx="22" ry="14" fill="#7a9e87" opacity=".6" transform="rotate(10 70 400)"/>
     </svg>';
-}
-
-function mg_get_quiz_questions(): array {
-    return [
-        [
-            'q' => 'What certification is Maple earning alongside their high school diploma?',
-            'opts' => ['EMT / Emergency Medical Technician', 'Nurse Aide', 'Firefighter I', 'Phlebotomist'],
-            'correct' => 0,
-            'fact' => 'Maple is earning their EMT certification at the same time as graduating high school — an incredible double achievement!',
-        ],
-        [
-            'q' => "What is Maple's favorite season?",
-            'opts' => ['Summer', 'Autumn', 'Spring', 'Winter'],
-            'correct' => 1,
-            'fact' => 'Maple loves the golden colors and crisp air of autumn — fitting for a farm party!',
-        ],
-        [
-            'q' => 'If Maple could travel anywhere in the world, where would they go?',
-            'opts' => ['Iceland', 'Italy', 'Japan', 'New Zealand'],
-            'correct' => 2,
-            'fact' => "Japan has always been at the top of Maple's travel bucket list!",
-        ],
-        [
-            'q' => "What is Maple's go-to comfort food?",
-            'opts' => ['Tacos', 'Mac and Cheese', 'Pizza', 'Ramen'],
-            'correct' => 3,
-            'fact' => "Maple never says no to a big bowl of ramen on a cold evening!",
-        ],
-        [
-            'q' => "Which best describes Maple's personality?",
-            'opts' => ['Calm & Introspective', 'Bold & Adventurous', 'Warm & Empathetic', 'Witty & Sarcastic'],
-            'correct' => 2,
-            'fact' => "Maple's warmth and empathy are exactly what makes them such a perfect fit for a career in emergency medicine.",
-        ],
-        [
-            'q' => "What is Maple's hidden talent?",
-            'opts' => ['Playing the guitar', 'Speed reading', 'Baking sourdough bread', 'Painting watercolors'],
-            'correct' => 2,
-            'fact' => 'Maple can bake an amazing loaf of sourdough — they started during the pandemic and never stopped!',
-        ],
-        [
-            'q' => "What's Maple's favorite way to decompress?",
-            'opts' => ['Hiking outdoors', 'Watching movies', 'Reading a good book', 'Listening to podcasts'],
-            'correct' => 0,
-            'fact' => "Maple loves getting out in nature — trail walks clear their head like nothing else.",
-        ],
-        [
-            'q' => 'Which quote best resonates with Maple?',
-            'opts' => [
-                '"Be the change you wish to see in the world."',
-                '"In the middle of difficulty lies opportunity."',
-                '"The purpose of life is to contribute in some way to making things better."',
-                '"You miss 100% of the shots you don\'t take."',
-            ],
-            'correct' => 2,
-            'fact' => 'Maple lives by this mindset — driven by purpose and a desire to make life better for those around them.',
-        ],
-    ];
 }
 ?>

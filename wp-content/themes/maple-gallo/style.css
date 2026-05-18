@@ -303,8 +303,11 @@ h1,h2,h3,h4,h5,h6 {
   gap: 4px;
 }
 .hero-detail-icon {
-  font-size: 1.5rem;
-  margin-bottom: 2px;
+  width: 28px;
+  height: 28px;
+  margin: 0 auto 4px;
+  color: var(--eucalyptus-dk);
+  display: block;
 }
 .hero-detail-label {
   font-size: .75rem;
@@ -597,7 +600,7 @@ h1,h2,h3,h4,h5,h6 {
   border-color: var(--eucalyptus-dk);
   background: rgba(122,158,135,0.08);
 }
-.upload-icon { font-size: 3rem; margin-bottom: 16px; display: block; }
+.upload-icon { width: 56px; height: 56px; margin: 0 auto 16px; color: var(--eucalyptus-dk); display: block; }
 .upload-box h3 {
   font-size: 1.4rem;
   margin-bottom: 8px;
@@ -694,41 +697,6 @@ h1,h2,h3,h4,h5,h6 {
 .upload-message.success { color: var(--eucalyptus-dk); }
 .upload-message.error   { color: #c0392b; }
 
-/* Pending uploads grid */
-.pending-uploads-section {
-  margin-top: 48px;
-}
-.pending-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 16px;
-  margin-top: 24px;
-}
-.pending-card {
-  background: var(--white);
-  border-radius: var(--radius);
-  overflow: hidden;
-  box-shadow: var(--shadow);
-  border: 1px solid var(--eucalyptus-lt);
-}
-.pending-card img {
-  width: 100%; aspect-ratio: 1; object-fit: cover;
-}
-.pending-card-meta {
-  padding: 12px;
-}
-.pending-card-name { font-weight: 600; font-size: .9rem; margin-bottom: 2px; }
-.pending-card-caption { font-size: .8rem; color: var(--soft-gray); }
-.pending-badge {
-  display: inline-block;
-  font-size: .7rem;
-  padding: 2px 8px;
-  border-radius: 10px;
-  font-weight: 700;
-  margin-top: 6px;
-}
-.pending-badge.pending { background: var(--gold-lt); color: var(--warm-wood); }
-.pending-badge.approved { background: rgba(122,158,135,0.2); color: var(--eucalyptus-dk); }
 
 /* ============================================================
    TRIVIA / QUIZ
@@ -1179,53 +1147,6 @@ h1,h2,h3,h4,h5,h6 {
   opacity: .7;
 }
 
-/* ============================================================
-   RSVP / SCHEDULE
-   ============================================================ */
-.schedule-section { background: var(--white); }
-
-.timeline {
-  max-width: 640px;
-  margin: 0 auto;
-  position: relative;
-  padding-left: 32px;
-}
-.timeline::before {
-  content: '';
-  position: absolute;
-  left: 15px; top: 0; bottom: 0;
-  width: 2px;
-  background: linear-gradient(to bottom, var(--eucalyptus-lt), var(--gold), var(--eucalyptus-lt));
-}
-.timeline-item {
-  position: relative;
-  padding-bottom: 36px;
-}
-.timeline-item:last-child { padding-bottom: 0; }
-.timeline-dot {
-  position: absolute;
-  left: -25px; top: 4px;
-  width: 16px; height: 16px;
-  border-radius: 50%;
-  background: var(--gold);
-  border: 3px solid var(--white);
-  box-shadow: 0 0 0 2px var(--gold);
-}
-.timeline-time {
-  font-size: .8rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .1em;
-  color: var(--eucalyptus-dk);
-  margin-bottom: 4px;
-}
-.timeline-title {
-  font-family: var(--font-heading);
-  font-size: 1.15rem;
-  color: var(--dark-wood);
-  margin-bottom: 4px;
-}
-.timeline-desc { font-size: .9rem; color: var(--soft-gray); }
 
 /* ============================================================
    FOOTER
@@ -1259,28 +1180,6 @@ h1,h2,h3,h4,h5,h6 {
   color: rgba(255,255,255,0.4);
 }
 
-/* ============================================================
-   ADMIN UPLOAD REVIEW PANEL
-   ============================================================ */
-.admin-panel {
-  background: var(--dark-wood);
-  color: var(--cream);
-  padding: 16px 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position: fixed;
-  bottom: 0; left: 0; right: 0;
-  z-index: 200;
-  box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
-  display: none;
-}
-.admin-panel.show { display: flex; }
-.admin-panel-text { font-size: .9rem; }
-.admin-panel-text strong { color: var(--gold); }
-.admin-panel-actions { display: flex; gap: 12px; }
-.admin-approve { background: var(--eucalyptus-dk); color: var(--white); border: none; padding: 8px 20px; border-radius: 20px; cursor: pointer; font-weight: 600; font-size: .85rem; }
-.admin-reject  { background: rgba(231,76,60,0.8); color: var(--white); border: none; padding: 8px 20px; border-radius: 20px; cursor: pointer; font-weight: 600; font-size: .85rem; }
 
 /* ============================================================
    TOAST NOTIFICATIONS
